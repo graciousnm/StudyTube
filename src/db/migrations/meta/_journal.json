@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1789675837631,
+      "tag": "0000_robust_apocalypse",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789695493313,
+      "tag": "0001_robust_absorbing_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789734899652,
+      "tag": "0002_wild_sheva_callister",
+      "breakpoints": true
+    }
+  ]
+}
