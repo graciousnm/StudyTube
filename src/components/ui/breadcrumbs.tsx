@@ -22,14 +22,14 @@ export function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
             {item.href && !isLast ? (
               <Link
                 href={item.href}
-                className="truncate hover:text-zinc-100"
+                className="min-w-0 max-w-full truncate hover:text-zinc-100"
               >
                 {item.label}
               </Link>
             ) : (
               <span
                 aria-current={isLast ? "page" : undefined}
-                className={`truncate ${isLast ? "font-medium text-zinc-100" : ""}`}
+                className={`min-w-0 max-w-full truncate ${isLast ? "font-medium text-zinc-100" : ""}`}
               >
                 {item.label}
               </span>
