@@ -41,6 +41,7 @@ export function YouTubePlayer({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(onProgress);
   const endedRef = useRef(onEnded);
+  const startSecondsRef = useRef(startSeconds);
   const playerRef = useRef<YouTubePlayerInstance | undefined>(undefined);
   const readyRef = useRef(false);
   const [error, setError] = useState(false);
@@ -54,6 +55,10 @@ export function YouTubePlayer({
   useEffect(() => {
     endedRef.current = onEnded;
   }, [onEnded]);
+
+  useEffect(() => {
+    startSecondsRef.current = startSeconds;
+  }, [startSeconds]);
 
   useEffect(() => {
     playbackRateRef.current = playbackRate;
@@ -93,7 +98,7 @@ export function YouTubePlayer({
           rel: 0,
           playsinline: 1,
           modestbranding: 1,
-          start: Math.max(0, Math.floor(startSeconds)),
+          start: Math.max(0, Math.floor(startSecondsRef.current)),
         },
         events: {
           onReady: () => {
@@ -103,8 +108,8 @@ export function YouTubePlayer({
             }
             readyRef.current = true;
             playerRef.current = player;
-            if (startSeconds > 0) {
-              player?.seekTo(startSeconds, true);
+            if (startSecondsRef.current > 0) {
+              player?.seekTo(startSecondsRef.current, true);
             }
             player?.setPlaybackRate(playbackRateRef.current);
           },
@@ -146,12 +151,6 @@ export function YouTubePlayer({
       host.remove();
     };
   }, [videoId, title]);
-
-  useEffect(() => {
-    if (readyRef.current && playerRef.current && startSeconds > 0) {
-      playerRef.current.seekTo(startSeconds, true);
-    }
-  }, [startSeconds]);
 
   useEffect(() => {
     if (readyRef.current && playerRef.current) {

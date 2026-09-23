@@ -104,6 +104,5 @@ export async function savePlaybackPositionAction(
   }
 
   savePlaybackPosition(db, lesson.id, parsed.data.position, parsed.data.duration ?? null);
-  revalidatePath("/");
   return { success: true };
 }

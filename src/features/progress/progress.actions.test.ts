@@ -149,7 +149,7 @@ describe("setLessonCompletedAction", () => {
 });
 
 describe("savePlaybackPositionAction", () => {
-  it("saves a playback position and revalidates home", async () => {
+  it("saves a playback position without revalidating", async () => {
     const lesson = addLesson("aaaaaaaaaaa");
 
     const state = await actions.savePlaybackPositionAction(lesson.id, 42, 600);
@@ -158,7 +158,7 @@ describe("savePlaybackPositionAction", () => {
     expect(
       getLessonProgress(getDb(), lesson.id)?.playback_position_seconds,
     ).toBe(42);
-    expect(revalidatePath).toHaveBeenCalledWith("/");
+    expect(revalidatePath).not.toHaveBeenCalled();
   });
 
   it("clamps a position beyond the duration", async () => {
