@@ -70,7 +70,15 @@ export default async function CoursePage({ params }: CoursePageProps) {
               description={course.description}
             />
           </div>
-          <AddModuleButton courseId={course.id} size="sm" />
+          <div className="shrink-0">
+            <div className="shrink-0">
+            <div className="shrink-0">
+            <div className="shrink-0">
+            <AddModuleButton courseId={course.id} size="sm" />
+          </div>
+          </div>
+          </div>
+          </div>
         </div>
 
         {course.description && (

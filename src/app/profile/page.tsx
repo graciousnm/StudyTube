@@ -32,7 +32,9 @@ export default function ProfilePage() {
             Learner profile · all stats are local to this installation
           </p>
         </div>
-        <NameEditDialog name={installed.name} />
+        <div className="shrink-0">
+          <NameEditDialog name={installed.name} />
+        </div>
       </div>
 
       <LearnerStatsPanel stats={stats} />

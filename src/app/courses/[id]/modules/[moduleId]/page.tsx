@@ -98,10 +98,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </div>
           <Link
             href={`/courses/${course.id}/modules/${mod.id}/add`}
-            className={buttonVariants({ variant: "primary", size: "sm" })}
+            className={`${buttonVariants({ variant: "primary", size: "sm" })} shrink-0`}
           >
             <PlusIcon className="h-4 w-4" />
-            Add YouTube Video
+            <span className="sm:hidden">Add Video</span>
+            <span className="hidden sm:inline">Add YouTube Video</span>
           </Link>
         </div>
 
