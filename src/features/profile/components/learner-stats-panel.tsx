@@ -32,19 +32,34 @@ function StatCard({
   );
 }
 
-function CourseStateChip({ state }: { state: LearnerStats["courseEntries"][number]["state"] }) {
-  const classes: Record<LearnerStats["courseEntries"][number]["state"], string> = {
-    completed: "text-success",
-    in_progress: "text-brand",
-    not_started: "text-zinc-500",
+function CourseStateDot({
+  state,
+}: {
+  state: LearnerStats["courseEntries"][number]["state"];
+}) {
+  const classes: Record<
+    LearnerStats["courseEntries"][number]["state"],
+    string
+  > = {
+    completed: "bg-success",
+    in_progress: "bg-brand",
+    not_started: "bg-zinc-600",
   };
-  const labels: Record<LearnerStats["courseEntries"][number]["state"], string> = {
+  const labels: Record<
+    LearnerStats["courseEntries"][number]["state"],
+    string
+  > = {
     completed: "Completed",
     in_progress: "In progress",
     not_started: "Not started",
   };
   return (
-    <span className={`text-sm font-medium ${classes[state]}`}>{labels[state]}</span>
+    <span
+      title={labels[state]}
+      className={`h-2.5 w-2.5 shrink-0 rounded-full ${classes[state]}`}
+    >
+      <span className="sr-only">{labels[state]}</span>
+    </span>
   );
 }
 
@@ -102,7 +117,7 @@ export function LearnerStatsPanel({ stats }: LearnerStatsPanelProps) {
 
       {stats.courseEntries.length > 0 ? (
         <div>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-lg font-semibold tracking-tight text-zinc-100">
               Course progress
             </h2>
@@ -136,10 +151,10 @@ export function LearnerStatsPanel({ stats }: LearnerStatsPanelProps) {
                     className="flex h-full flex-col rounded-xl border border-zinc-800 bg-zinc-900 p-5 shadow-sm transition-all hover:border-zinc-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-semibold text-zinc-100">
+                      <h3 className="min-w-0 flex-1 font-semibold text-zinc-100 line-clamp-2">
                         {entry.title}
                       </h3>
-                      <CourseStateChip state={entry.state} />
+                      <CourseStateDot state={entry.state} />
                     </div>
                     <div className="mt-auto pt-4">
                       <ProgressBar
