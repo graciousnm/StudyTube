@@ -104,7 +104,7 @@ afterAll(() => {
 
 describe("search and add integration", () => {
   it("creates a lesson from a normalized search result", async () => {
-    const results = await searchYouTube("normalized");
+    const { items: results } = await searchYouTube("normalized");
     expect(results).toHaveLength(1);
 
     const selected = results[0];

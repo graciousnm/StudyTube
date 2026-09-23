@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useActionState, type ComponentType } from "react";
+import { toast } from "sonner";
 import {
   CheckIcon,
   CircleIcon,
@@ -51,9 +52,10 @@ export function LessonCompleteButton({
 
   useEffect(() => {
     if (actionState.success) {
+      toast.success(completed ? "Lesson marked complete" : "Lesson marked incomplete");
       router.refresh();
     }
-  }, [actionState.success, router]);
+  }, [actionState.success, router, completed]);
 
   const label = completed
     ? `Mark "${title}" as incomplete`

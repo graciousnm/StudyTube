@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { SearchIcon } from "@/components/ui/icons";
+import { TabBar } from "@/components/ui/tabs";
 import type { Course } from "@/db/schema";
 import type { ProgressSummary } from "@/features/progress/progress.types";
 import { CourseCard } from "./course-card";
@@ -11,9 +12,10 @@ type FilterState = "all" | "in_progress" | "completed";
 interface CourseGridProps {
   courses: Course[];
   progressByCourse: Map<number, ProgressSummary>;
+  thumbnailMap?: Map<number, string | null>;
 }
 
-export function CourseGrid({ courses, progressByCourse }: CourseGridProps) {
+export function CourseGrid({ courses, progressByCourse, thumbnailMap }: CourseGridProps) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterState>("all");
 
@@ -49,22 +51,7 @@ export function CourseGrid({ courses, progressByCourse }: CourseGridProps) {
             className="h-10 w-full rounded-lg border border-zinc-800 bg-zinc-900 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-700 focus:outline-none"
           />
         </div>
-        <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900 p-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setFilter(tab.key)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                filter === tab.key
-                  ? "bg-zinc-700 text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <TabBar tabs={tabs} active={filter} onChange={setFilter} />
       </div>
 
       {filtered.length === 0 ? (
@@ -78,6 +65,7 @@ export function CourseGrid({ courses, progressByCourse }: CourseGridProps) {
               key={course.id}
               course={course}
               progress={progressByCourse.get(course.id) ?? { completed: 0, total: 0, isEmpty: true, isComplete: false, percent: null }}
+              thumbnailUrl={thumbnailMap?.get(course.id)}
             />
           ))}
         </ul>

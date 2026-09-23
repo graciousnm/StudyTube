@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
@@ -181,6 +182,13 @@ export function PlaylistImportPanel({
       total: ids.length,
       done: true,
     });
+
+    if (result.added > 0) {
+      toast.success(`${result.added} video${result.added === 1 ? "" : "s"} added to module`);
+    }
+    if (result.duplicates > 0) {
+      toast.warning(`${result.duplicates} duplicate${result.duplicates === 1 ? "" : "s"} skipped`);
+    }
 
     setSelected(new Set());
   }, [courseId, moduleId, selected]);

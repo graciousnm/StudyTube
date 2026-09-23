@@ -3,7 +3,7 @@ import { BookOpenIcon } from "@/components/ui/icons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getDb } from "@/db/client";
 import { CourseGrid } from "@/features/courses/components/course-grid";
-import { listCourses } from "@/features/courses/course.queries";
+import { getFirstLessonThumbnails, listCourses } from "@/features/courses/course.queries";
 import { CreateCourseButton } from "@/features/ai/components/create-course-button";
 import { ContinueLearningCard } from "@/features/progress/components/continue-learning-card";
 import { deriveProgress } from "@/features/progress/progress.calculations";
@@ -22,6 +22,7 @@ export default function HomePage() {
   const installed = getProfile(db);
   const continueLearning = getContinueLearning(db);
   const progressByCourse = getCourseProgressMap(db);
+  const thumbnailMap = getFirstLessonThumbnails(db);
   const aiAvailable = !!process.env.OPENROUTER_API_KEY;
 
   return (
@@ -59,7 +60,7 @@ export default function HomePage() {
           {!installed ? <CompleteStepButton /> : null}
         </EmptyState>
       ) : (
-        <CourseGrid courses={courses} progressByCourse={progressByCourse} />
+        <CourseGrid courses={courses} progressByCourse={progressByCourse} thumbnailMap={thumbnailMap} />
       )}
     </Container>
   );

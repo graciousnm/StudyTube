@@ -7,6 +7,7 @@ import { getCourseById } from "@/features/courses/course.queries";
 import { courseIdSchema } from "@/features/courses/course.validation";
 import { getModuleInCourse } from "@/features/modules/module.queries";
 import { moduleIdSchema } from "@/features/modules/module.validation";
+import { listLessonsByModule } from "@/features/lessons/lesson.queries";
 import { YouTubeSearchPanel } from "@/features/youtube/components/youtube-search-panel";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,9 @@ export default async function AddVideoPage({ params }: AddVideoPageProps) {
     notFound();
   }
 
+  const existingLessons = listLessonsByModule(db, mod.id);
+  const existingVideoIds = new Set(existingLessons.map((l) => l.youtube_video_id));
+
   return (
     <Container size="lg" className="space-y-8">
       <div>
@@ -59,7 +63,7 @@ export default async function AddVideoPage({ params }: AddVideoPageProps) {
       </div>
 
       <section>
-        <YouTubeSearchPanel courseId={course.id} moduleId={mod.id} />
+        <YouTubeSearchPanel courseId={course.id} moduleId={mod.id} existingVideoIds={existingVideoIds} />
       </section>
     </Container>
   );

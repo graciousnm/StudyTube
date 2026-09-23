@@ -115,13 +115,20 @@ export async function fetchDurations(
   return durations;
 }
 
-export async function searchYouTube(query: string): Promise<YouTubeVideo[]> {
-  const json = await youtubeGet("search", {
+export async function searchYouTube(
+  query: string,
+  pageToken?: string,
+): Promise<{ items: YouTubeVideo[]; nextPageToken: string | null }> {
+  const params: Record<string, string> = {
     part: "snippet",
     type: "video",
     maxResults: String(SEARCH_MAX_RESULTS),
     q: query,
-  });
+  };
+  if (pageToken) {
+    params.pageToken = pageToken;
+  }
+  const json = await youtubeGet("search", params);
   const parsed = searchResponseSchema.safeParse(json);
   if (!parsed.success) {
     throw new YouTubeError(
@@ -137,9 +144,17 @@ export async function searchYouTube(query: string): Promise<YouTubeVideo[]> {
       ? await fetchDurations(videoIds)
       : new Map<string, number | null>();
 
-  return items
-    .map((item) => normalizeSearchItem(item, durations))
-    .filter((video): video is YouTubeVideo => video !== null);
+  const nextPageToken =
+    json && typeof json === "object" && "nextPageToken" in json
+      ? (json as { nextPageToken?: string }).nextPageToken ?? null
+      : null;
+
+  return {
+    items: items
+      .map((item) => normalizeSearchItem(item, durations))
+      .filter((video): video is YouTubeVideo => video !== null),
+    nextPageToken,
+  };
 }
 
 export async function getVideoMetadata(

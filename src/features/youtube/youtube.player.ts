@@ -13,6 +13,9 @@ export interface YouTubePlayerInstance {
   getCurrentTime: () => number;
   getDuration: () => number;
   seekTo: (seconds: number, allowSeekAhead: boolean) => void;
+  setPlaybackRate: (suggestedRate: number) => void;
+  getPlaybackRate: () => number;
+  getAvailablePlaybackRates: () => number[];
   destroy: () => void;
   getIframe?: () => HTMLIFrameElement;
 }

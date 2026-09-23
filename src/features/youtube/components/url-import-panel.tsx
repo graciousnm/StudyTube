@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CheckIcon, PlusIcon } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ export function UrlImportPanel({ courseId, moduleId }: UrlImportPanelProps) {
       const state = await addVideoByUrlAction(courseId, moduleId, trimmed);
       setResult(state);
       if (state.success) {
+        toast.success("Video added to module");
         setUrl("");
       }
     });

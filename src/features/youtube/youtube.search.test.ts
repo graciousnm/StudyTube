@@ -83,7 +83,7 @@ describe("searchYouTube", () => {
     process.env.YOUTUBE_API_KEY = "TESTKEY";
     mockSuccess();
 
-    const results = await searchYouTube("learning");
+    const { items: results } = await searchYouTube("learning");
 
     expect(results).toHaveLength(2);
     expect(results[0]).toEqual({
@@ -109,7 +109,7 @@ describe("searchYouTube", () => {
       ),
     );
 
-    await expect(searchYouTube("nothing")).resolves.toEqual([]);
+    await expect(searchYouTube("nothing")).resolves.toEqual({ items: [], nextPageToken: null });
   });
 
   it("reports when the API key is not configured", async () => {
@@ -167,7 +167,7 @@ describe("searchYouTube", () => {
     process.env.YOUTUBE_API_KEY = "SUPERSECRETKEY";
     mockSuccess();
 
-    const results = await searchYouTube("learning");
+    const { items: results } = await searchYouTube("learning");
     expect(JSON.stringify(results)).not.toContain("SUPERSECRETKEY");
   });
 });

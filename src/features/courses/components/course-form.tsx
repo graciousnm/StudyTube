@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,7 @@ export function CourseForm({
   >(async (prevState, formData) => {
     const next = await action(prevState, formData);
     if (!next.error && !next.fieldErrors) {
+      toast.success(defaultValue ? "Course updated" : "Course created");
       onSuccess?.();
     }
     return next;

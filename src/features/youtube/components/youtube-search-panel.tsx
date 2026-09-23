@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CloseIcon, SearchIcon } from "@/components/ui/icons";
+import { CheckIcon, CloseIcon, SearchIcon } from "@/components/ui/icons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TabBar } from "@/components/ui/tabs";
 import { AddVideoButton } from "@/features/youtube/components/add-video-button";
 import { UrlImportPanel } from "@/features/youtube/components/url-import-panel";
 import { PlaylistImportPanel } from "@/features/youtube/components/playlist-import-panel";
@@ -23,17 +25,21 @@ const tabs: { key: TabKey; label: string }[] = [
 interface YouTubeSearchPanelProps {
   courseId: number;
   moduleId: number;
+  existingVideoIds?: Set<string>;
 }
 
 export function YouTubeSearchPanel({
   courseId,
   moduleId,
+  existingVideoIds,
 }: YouTubeSearchPanelProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<YouTubeSearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [preview, setPreview] = useState<YouTubeSearchResult | null>(null);
 
   useEffect(() => {
@@ -55,6 +61,7 @@ export function YouTubeSearchPanel({
     setLoading(true);
     setError(null);
     setResults([]);
+    setNextPageToken(null);
     setPreview(null);
     try {
       const response = await fetch(
@@ -65,7 +72,12 @@ export function YouTubeSearchPanel({
         setError(data?.error ?? "YouTube search is temporarily unavailable.");
         return;
       }
-      setResults(data.results ?? []);
+      const allResults = data.results ?? [];
+      setResults(allResults.filter(
+        (r: YouTubeSearchResult, i: number, arr: YouTubeSearchResult[]) =>
+          arr.findIndex((x) => x.youtubeVideoId === r.youtubeVideoId) === i,
+      ));
+      setNextPageToken(data.nextPageToken ?? null);
     } catch {
       setError("YouTube search is temporarily unavailable.");
     } finally {
@@ -73,24 +85,36 @@ export function YouTubeSearchPanel({
     }
   }
 
+  async function handleLoadMore() {
+    if (!nextPageToken || !query.trim()) return;
+    setLoadingMore(true);
+    try {
+      const response = await fetch(
+        `/api/youtube/search?q=${encodeURIComponent(query.trim())}&pageToken=${encodeURIComponent(nextPageToken)}`,
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data?.error ?? "Failed to load more results.");
+        return;
+      }
+      setResults((prev) => {
+        const combined = [...prev, ...(data.results ?? [])];
+        return combined.filter(
+          (r: YouTubeSearchResult, i: number, arr: YouTubeSearchResult[]) =>
+            arr.findIndex((x) => x.youtubeVideoId === r.youtubeVideoId) === i,
+        );
+      });
+      setNextPageToken(data.nextPageToken ?? null);
+    } catch {
+      setError("Failed to load more results.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   return (
     <div>
-      <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900 p-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? "bg-zinc-700 text-zinc-100"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
       <div className="mt-4">
         {activeTab === "search" ? (
@@ -113,7 +137,17 @@ export function YouTubeSearchPanel({
 
             <div className="mt-4" aria-live="polite">
               {loading ? (
-                <p className="text-sm text-zinc-400">Searching…</p>
+                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <li key={i} className="flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900">
+                      <Skeleton className="aspect-video w-full rounded-none" />
+                      <div className="space-y-2 p-3">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               ) : null}
               {!loading && error ? (
                 <p className="text-sm text-red-400">{error}</p>
@@ -165,16 +199,36 @@ export function YouTubeSearchPanel({
                       >
                         Preview
                       </Button>
-                      <AddVideoButton
-                        courseId={courseId}
-                        moduleId={moduleId}
-                        videoId={result.youtubeVideoId}
-                      />
+                      {existingVideoIds?.has(result.youtubeVideoId) ? (
+                        <Button type="button" size="sm" variant="secondary" disabled>
+                          <CheckIcon className="h-4 w-4" />
+                          Already Added
+                        </Button>
+                      ) : (
+                        <AddVideoButton
+                          courseId={courseId}
+                          moduleId={moduleId}
+                          videoId={result.youtubeVideoId}
+                        />
+                      )}
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
+
+            {nextPageToken && (
+              <div className="mt-4 flex justify-center">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? "Loading…" : "Load More"}
+                </Button>
+              </div>
+            )}
           </>
         ) : null}
 

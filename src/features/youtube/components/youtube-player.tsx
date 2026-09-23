@@ -8,6 +8,20 @@ import {
 } from "@/features/youtube/youtube.player";
 
 const PROGRESS_INTERVAL_MS = 10_000;
+const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+const SPEED_STORAGE_KEY = "studytube-playback-speed";
+
+function getStoredSpeed(): number {
+  if (typeof window === "undefined") return 1;
+  try {
+    const stored = localStorage.getItem(SPEED_STORAGE_KEY);
+    if (stored) {
+      const num = Number(stored);
+      if (PLAYBACK_SPEEDS.includes(num)) return num;
+    }
+  } catch {}
+  return 1;
+}
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -30,6 +44,8 @@ export function YouTubePlayer({
   const playerRef = useRef<YouTubePlayerInstance | undefined>(undefined);
   const readyRef = useRef(false);
   const [error, setError] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState<number>(getStoredSpeed);
+  const playbackRateRef = useRef(playbackRate);
 
   useEffect(() => {
     progressRef.current = onProgress;
@@ -38,6 +54,10 @@ export function YouTubePlayer({
   useEffect(() => {
     endedRef.current = onEnded;
   }, [onEnded]);
+
+  useEffect(() => {
+    playbackRateRef.current = playbackRate;
+  }, [playbackRate]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -86,6 +106,7 @@ export function YouTubePlayer({
             if (startSeconds > 0) {
               player?.seekTo(startSeconds, true);
             }
+            player?.setPlaybackRate(playbackRateRef.current);
           },
           onError: () => {
             if (!cancelled) setError(true);
@@ -132,6 +153,15 @@ export function YouTubePlayer({
     }
   }, [startSeconds]);
 
+  useEffect(() => {
+    if (readyRef.current && playerRef.current) {
+      playerRef.current.setPlaybackRate(playbackRate);
+      try {
+        localStorage.setItem(SPEED_STORAGE_KEY, String(playbackRate));
+      } catch {}
+    }
+  }, [playbackRate]);
+
   if (error) {
     return (
       <div className="flex aspect-video w-full items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800">
@@ -148,12 +178,31 @@ export function YouTubePlayer({
   }
 
   return (
-    <div
-      ref={wrapperRef}
-      data-testid="youtube-player"
-      data-video-id={videoId}
-      aria-label={title}
-      className="aspect-video w-full overflow-hidden rounded-xl bg-black"
-    />
+    <div className="space-y-2">
+      <div
+        ref={wrapperRef}
+        data-testid="youtube-player"
+        data-video-id={videoId}
+        aria-label={title}
+        className="aspect-video w-full overflow-hidden rounded-xl bg-black"
+      />
+      <div className="flex items-center gap-2">
+        <label htmlFor="playback-speed" className="text-xs text-zinc-400">
+          Speed
+        </label>
+        <select
+          id="playback-speed"
+          value={playbackRate}
+          onChange={(e) => setPlaybackRate(Number(e.target.value))}
+          className="rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200 focus:border-brand focus:outline-none"
+        >
+          {PLAYBACK_SPEEDS.map((speed) => (
+            <option key={speed} value={speed}>
+              {speed}x
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
   );
 }

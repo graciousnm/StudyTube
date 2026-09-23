@@ -107,7 +107,7 @@ export async function searchYouTubeBatchAction(
     const results = await Promise.all(
       queries.map(async (q) => {
         try {
-          const videos = await searchYouTube(q.query);
+          const { items: videos } = await searchYouTube(q.query);
           return {
             moduleIndex: q.moduleIndex,
             topicIndex: q.topicIndex,

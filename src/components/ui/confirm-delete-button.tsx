@@ -23,6 +23,9 @@ interface ConfirmDeleteButtonProps {
   pendingLabel?: string;
   iconOnly?: boolean;
   className?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }
 
 export function ConfirmDeleteButton({
@@ -34,8 +37,13 @@ export function ConfirmDeleteButton({
   pendingLabel = "Deleting…",
   iconOnly = false,
   className,
+  open: controlledOpen,
+  onOpenChange,
+  hideTrigger = false,
 }: ConfirmDeleteButtonProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [state, formAction, pending] = useActionState<
     ConfirmDeleteState,
     FormData
@@ -50,22 +58,24 @@ export function ConfirmDeleteButton({
 
   return (
     <>
-      {iconOnly ? (
-        <Button
-          variant="ghost-danger"
-          size="icon"
-          className={className}
-          onClick={() => setOpen(true)}
-          aria-label={triggerLabel}
-          title={triggerLabel}
-        >
-          <TrashIcon className="h-4 w-4" />
-        </Button>
-      ) : (
-        <Button variant="danger" onClick={() => setOpen(true)}>
-          <TrashIcon className="h-4 w-4" />
-          {triggerLabel}
-        </Button>
+      {!hideTrigger && (
+        iconOnly ? (
+          <Button
+            variant="ghost-danger"
+            size="icon"
+            className={className}
+            onClick={() => setOpen(true)}
+            aria-label={triggerLabel}
+            title={triggerLabel}
+          >
+            <TrashIcon className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button variant="danger" onClick={() => setOpen(true)}>
+            <TrashIcon className="h-4 w-4" />
+            {triggerLabel}
+          </Button>
+        )
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={heading}>

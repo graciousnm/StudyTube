@@ -15,18 +15,21 @@ function request(query: string): Request {
 
 describe("GET /api/youtube/search", () => {
   it("returns normalized search results", async () => {
-    searchYouTubeMock.mockResolvedValue([
-      {
-        youtubeVideoId: "aaaaaaaaaaa",
-        title: "Alpha",
-        channelId: null,
-        channelName: "Channel",
-        thumbnailUrl: null,
-        durationSeconds: 60,
-        description: null,
-        publishedAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-    ]);
+    searchYouTubeMock.mockResolvedValue({
+      items: [
+        {
+          youtubeVideoId: "aaaaaaaaaaa",
+          title: "Alpha",
+          channelId: null,
+          channelName: "Channel",
+          thumbnailUrl: null,
+          durationSeconds: 60,
+          description: null,
+          publishedAt: new Date("2024-01-01T00:00:00.000Z"),
+        },
+      ],
+      nextPageToken: null,
+    });
 
     const nextResponse = await GET(request("alpha"));
     expect(nextResponse.status).toBe(200);
@@ -53,13 +56,13 @@ describe("GET /api/youtube/search", () => {
   });
 
   it("sets no-store caching", async () => {
-    searchYouTubeMock.mockResolvedValue([]);
+    searchYouTubeMock.mockResolvedValue({ items: [], nextPageToken: null });
     const nextResponse = await GET(request("alpha"));
     expect(nextResponse.headers.get("cache-control")).toBe("no-store");
   });
 
   it("returns NextResponse instances", async () => {
-    searchYouTubeMock.mockResolvedValue([]);
+    searchYouTubeMock.mockResolvedValue({ items: [], nextPageToken: null });
     const nextResponse = await GET(request("alpha"));
     expect(nextResponse).toBeInstanceOf(NextResponse);
   });

@@ -159,6 +159,15 @@ export function UserIcon(props: IconProps) {
   );
 }
 
+export function HomeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </Icon>
+  );
+}
+
 export function PlayIcon({ className = "h-4 w-4", ...props }: IconProps) {
   return (
     <svg
@@ -213,6 +222,16 @@ export function GripVerticalIcon(props: IconProps) {
       <circle cx="15" cy="5" r="1" />
       <circle cx="15" cy="12" r="1" />
       <circle cx="15" cy="19" r="1" />
+    </Icon>
+  );
+}
+
+export function MoreVerticalIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="5" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="12" cy="19" r="1" />
     </Icon>
   );
 }

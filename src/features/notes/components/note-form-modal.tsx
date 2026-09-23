@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +38,7 @@ export function NoteFormModal({
         formData,
       );
       if (!result.error && !result.fieldErrors) {
+        toast.success(mode === "edit" ? "Note updated" : "Note saved");
         onClose();
       }
       return result;

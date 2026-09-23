@@ -18,9 +18,10 @@ export async function GET(request: Request) {
   }
 
   try {
-    const results = await searchYouTube(parsed.data);
+    const pageToken = searchParams.get("pageToken") ?? undefined;
+    const { items, nextPageToken } = await searchYouTube(parsed.data, pageToken);
     return NextResponse.json(
-      { results },
+      { results: items, nextPageToken },
       { headers: { "cache-control": "no-store" } },
     );
   } catch (error) {

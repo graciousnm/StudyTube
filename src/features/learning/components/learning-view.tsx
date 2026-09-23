@@ -118,6 +118,12 @@ export function LearningView({
             onEnded={handleEnded}
           />
 
+          {startSeconds > 0 && (
+            <p className="text-sm text-zinc-400">
+              Resuming from {formatDuration(startSeconds)}
+            </p>
+          )}
+
           <div className="flex flex-wrap items-center justify-between gap-4">
             <LessonCompleteButton
               courseId={course.id}

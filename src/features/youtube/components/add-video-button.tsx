@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useEffect, useActionState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@/components/ui/icons";
 import { addVideoToModuleAction } from "@/features/lessons/lesson.actions";
@@ -21,6 +22,12 @@ export function AddVideoButton({
     LessonActionState,
     FormData
   >(addVideoToModuleAction.bind(null, courseId, moduleId, videoId), {});
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success("Video added to module");
+    }
+  }, [state?.success]);
 
   if (state?.success) {
     return (
