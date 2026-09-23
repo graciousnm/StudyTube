@@ -52,6 +52,8 @@ export interface CurateVideosInput {
   courseTitle: string;
   courseDescription: string;
   modules: ModuleTopics[];
+  channel?: string;
+  notes?: string;
 }
 
 export interface VideoResult {

@@ -23,6 +23,8 @@ interface VideoCurationStepProps {
   modules: ModuleTopics[];
   courseTitle: string;
   courseDescription: string;
+  channel?: string;
+  notes?: string;
   onDone: () => void;
   onSkip: () => void;
 }
@@ -83,6 +85,8 @@ export function VideoCurationStep({
   modules,
   courseTitle,
   courseDescription,
+  channel,
+  notes,
   onDone,
   onSkip,
 }: VideoCurationStepProps) {
@@ -97,7 +101,7 @@ export function VideoCurationStep({
     let cancelled = false;
 
     async function run() {
-      const input = { courseTitle, courseDescription, modules };
+      const input = { courseTitle, courseDescription, modules, channel, notes };
 
       setPhase({ status: "queries" });
       const queriesResult = await generateSearchQueriesAction(input);
@@ -154,7 +158,7 @@ export function VideoCurationStep({
     return () => {
       cancelled = true;
     };
-  }, [courseTitle, courseDescription, modules]);
+  }, [courseTitle, courseDescription, modules, channel, notes]);
 
   function toggleVideo(moduleId: number, topic: string, video: CuratedVideo) {
     const key = `${moduleId}-${topic}`;

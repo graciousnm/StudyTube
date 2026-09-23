@@ -8,11 +8,13 @@ import { Modal } from "@/components/ui/modal";
 import { CourseFormModal } from "@/features/courses/components/course-form-modal";
 import { createCourseAction } from "@/features/courses/course.actions";
 import type { CourseOutline, ModuleTopics } from "@/features/ai/ai.types";
+import { CurationSetup } from "@/features/ai/components/curation-setup";
+import type { CurationPreferences } from "@/features/ai/components/curation-setup";
 import { OutlineForm } from "@/features/ai/components/outline-form";
 import { OutlineReview } from "@/features/ai/components/outline-review";
 import { VideoCurationStep } from "@/features/ai/components/video-curation-step";
 
-type Step = "choose" | "ai-form" | "ai-review" | "video-curation";
+type Step = "choose" | "ai-form" | "ai-review" | "curation-setup" | "video-curation";
 
 interface CreateCourseButtonProps {
   size?: "sm" | "md";
@@ -38,12 +40,14 @@ export function CreateCourseButton({
     courseId: number;
     modules: ModuleTopics[];
   } | null>(null);
+  const [videoPrefs, setVideoPrefs] = useState<CurationPreferences>({});
 
   function closeAi() {
     setAiOpen(false);
     setStep("choose");
     setOutline(null);
     setCourseData(null);
+    setVideoPrefs({});
   }
 
   function goToCourse() {
@@ -56,9 +60,11 @@ export function CreateCourseButton({
   const modalTitle =
     step === "video-curation"
       ? "Curate Videos"
-      : step === "ai-review"
-        ? "Review Your Learning Path"
-        : "Create a Learning Path";
+      : step === "curation-setup"
+        ? "Add Videos?"
+        : step === "ai-review"
+          ? "Review Your Learning Path"
+          : "Create a Learning Path";
 
   return (
     <>
@@ -75,6 +81,7 @@ export function CreateCourseButton({
           setStep("choose");
           setOutline(null);
           setCourseData(null);
+          setVideoPrefs({});
         }}
       >
         <PlusIcon className="h-4 w-4" />
@@ -141,8 +148,18 @@ export function CreateCourseButton({
             onRegenerate={() => setStep("ai-form")}
             onCreated={(data) => {
               setCourseData(data);
+              setStep("curation-setup");
+            }}
+          />
+        )}
+
+        {step === "curation-setup" && courseData && (
+          <CurationSetup
+            onStart={(prefs) => {
+              setVideoPrefs(prefs);
               setStep("video-curation");
             }}
+            onSkip={goToCourse}
           />
         )}
 
@@ -152,6 +169,8 @@ export function CreateCourseButton({
             modules={courseData.modules}
             courseTitle={outline?.title ?? ""}
             courseDescription={outline?.description ?? ""}
+            channel={videoPrefs.channel}
+            notes={videoPrefs.notes}
             onDone={goToCourse}
             onSkip={goToCourse}
           />

@@ -225,6 +225,12 @@ function buildSearchQueryUserPrompt(input: CurateVideosInput): string {
   if (input.courseDescription) {
     prompt += `\nDescription: ${input.courseDescription}`;
   }
+  if (input.channel) {
+    prompt += `\nPreferred channel: ${input.channel}\nGuidance: Bias queries toward this channel when relevant, but keep results useful even if the channel has no video for a topic.`;
+  }
+  if (input.notes) {
+    prompt += `\nGuidance: ${input.notes}`;
+  }
   prompt += "\n\nModules and topics:";
   for (let mi = 0; mi < input.modules.length; mi++) {
     const mod = input.modules[mi];
@@ -291,6 +297,12 @@ function buildVideoSelectUserPrompt(
   let prompt = `Course: ${input.courseTitle}\n`;
   if (input.courseDescription) {
     prompt += `Description: ${input.courseDescription}\n`;
+  }
+  if (input.channel) {
+    prompt += `Preferred channel: ${input.channel}\nPrefer videos from this channel when a strong match exists.\n`;
+  }
+  if (input.notes) {
+    prompt += `Guidance: ${input.notes}\n`;
   }
 
   for (const topic of topicsWithResults) {
