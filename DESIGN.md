@@ -818,6 +818,8 @@ Deleting the note uses the standard confirm dialog.
 
 They should support learning without becoming a full document editor.
 
+Timestamps written in the note as `[MM:SS]` or `[H:MM:SS]` render as clickable accent chips on the read-only card. Clicking a chip seeks the lesson's YouTube player to that position (`[1:23]` → 83 seconds). The stored note keeps the literal timestamp text.
+
 Example:
 
 ```text

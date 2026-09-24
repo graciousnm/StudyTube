@@ -15,6 +15,7 @@ interface NotesPanelProps {
   moduleId: number;
   lessonId: number;
   note: NoteView | null;
+  onSeek?: (seconds: number) => void;
 }
 
 export function NotesPanel({
@@ -22,6 +23,7 @@ export function NotesPanel({
   moduleId,
   lessonId,
   note,
+  onSeek,
 }: NotesPanelProps) {
   const [form, setForm] = useState<{ open: boolean; mode: "create" | "edit" }>({
     open: false,
@@ -70,6 +72,7 @@ export function NotesPanel({
           content={note.content}
           createdAt={note.createdAt}
           updatedAt={note.updatedAt}
+          onSeek={onSeek}
         />
       ) : (
         <EmptyState

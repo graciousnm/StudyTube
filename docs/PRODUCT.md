@@ -743,6 +743,8 @@ A note may be associated with:
 
 The initial experience should support basic text notes.
 
+Timestamped notes: timestamps written as `[MM:SS]` or `[H:MM:SS]` in a note render as clickable chips. Clicking one seeks the lesson's YouTube player to that point in the video. This helps learners anchor ideas to the exact moment they were said.
+
 Do not build a full document editor in V1.
 
 ---
@@ -1103,6 +1105,7 @@ The V1 release should contain:
 ### Notes
 
 - Basic lesson notes
+- Clickable video timestamps in notes
 
 ### Platform
 

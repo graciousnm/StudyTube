@@ -640,6 +640,8 @@ YouTube IFrame Player API
 
 The player should communicate playback information to the progress feature.
 
+The player exposes an imperative seek handle. Timestamped notes on the lesson page use it to jump the video to the note's timestamp when clicked. Only one player exists per learning page, so the seek handle always targets the active lesson video.
+
 ---
 
 # 34. Player Does Not Own Progress Rules

@@ -830,6 +830,8 @@ Note:
 
 The note content is plain text in V1.
 
+Timestamps written in `[MM:SS]` or `[H:MM:SS]` form are recognized in note content and rendered as clickable chips that seek the lesson player to that position. The stored note content keeps the literal timestamp text — no separate timestamp schema is introduced.
+
 Do not introduce a rich-text document format.
 
 Do not store HTML from untrusted input.
@@ -844,7 +846,6 @@ Future versions may support:
 
 - Course-level notes
 - Module-level notes
-- Timestamped video notes
 - Rich text
 
 These should not affect the V1 schema unless explicitly implemented.

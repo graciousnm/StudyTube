@@ -7,7 +7,6 @@ import { LearningView } from "@/features/learning/components/learning-view";
 import { getLearningContext } from "@/features/learning/learning.queries";
 import { lessonIdSchema } from "@/features/lessons/lesson.validation";
 import { moduleIdSchema } from "@/features/modules/module.validation";
-import { NotesPanel } from "@/features/notes/components/notes-panel";
 import { getNoteByLesson } from "@/features/notes/notes.queries";
 import {
   clampPlaybackPosition,
@@ -100,14 +99,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
         courseProgress={courseProgress}
         previous={context.previous}
         next={context.next}
-      >
-        <NotesPanel
-          courseId={context.course.id}
-          moduleId={context.module.id}
-          lessonId={context.lesson.id}
-          note={noteView}
-        />
-      </LearningView>
+        note={noteView}
+      />
     </Container>
   );
 }

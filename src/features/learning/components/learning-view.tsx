@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useTransition, type ReactNode } from "react";
+import { useCallback, useMemo, useRef, useTransition } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ArrowLeftIcon, ArrowRightIcon } from "@/components/ui/icons";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { learningPath } from "@/features/learning/learning.paths";
 import type { LessonNeighbour } from "@/features/learning/learning.types";
+import { NotesPanel } from "@/features/notes/components/notes-panel";
+import type { NoteView } from "@/features/notes/notes.types";
 import { LessonCompleteButton } from "@/features/progress/components/lesson-complete-button";
 import { progressLabel } from "@/features/progress/progress.calculations";
 import { savePlaybackPositionAction, setLessonCompletedAction } from "@/features/progress/progress.actions";
@@ -17,7 +19,7 @@ import type {
   LessonState,
   ProgressSummary,
 } from "@/features/progress/progress.types";
-import { YouTubePlayer } from "@/features/youtube/components/youtube-player";
+import { YouTubePlayer, type YouTubePlayerHandle } from "@/features/youtube/components/youtube-player";
 import { formatDuration } from "@/lib/format";
 
 interface LearningViewProps {
@@ -37,7 +39,7 @@ interface LearningViewProps {
   courseProgress: ProgressSummary;
   previous?: LessonNeighbour;
   next?: LessonNeighbour;
-  children?: ReactNode;
+  note: NoteView | null;
 }
 
 export function LearningView({
@@ -51,10 +53,11 @@ export function LearningView({
   courseProgress,
   previous,
   next,
-  children,
+  note,
 }: LearningViewProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const playerRef = useRef<YouTubePlayerHandle>(null);
   const saveQueue = useMemo(
     () =>
       createPlaybackSaveQueue((input) =>
@@ -80,6 +83,10 @@ export function LearningView({
       router.refresh();
     });
   }, [state, course.id, module.id, lesson.id, router]);
+
+  const handleSeek = useCallback((seconds: number) => {
+    playerRef.current?.seekTo(seconds);
+  }, []);
 
   const duration = formatDuration(lesson.duration);
   const moduleHref = `/courses/${course.id}/modules/${module.id}`;
@@ -111,6 +118,7 @@ export function LearningView({
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="min-w-0 flex-1 space-y-4">
           <YouTubePlayer
+            ref={playerRef}
             videoId={lesson.videoId}
             title={lesson.title}
             startSeconds={startSeconds}
@@ -181,11 +189,15 @@ export function LearningView({
           </div>
         </div>
 
-        {children ? (
-          <aside className="w-full shrink-0 border-t border-zinc-800 pt-4 lg:w-80 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0">
-            {children}
-          </aside>
-        ) : null}
+        <aside className="w-full shrink-0 border-t border-zinc-800 pt-4 lg:w-80 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0">
+          <NotesPanel
+            courseId={course.id}
+            moduleId={module.id}
+            lessonId={lesson.id}
+            note={note}
+            onSeek={handleSeek}
+          />
+        </aside>
       </div>
     </div>
   );
