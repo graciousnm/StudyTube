@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { courseIdSchema, courseInputSchema } from "./course.validation";
+import {
+  courseIdSchema,
+  courseImportSchema,
+  courseInputSchema,
+} from "./course.validation";
 
 describe("courseInputSchema", () => {
   it("accepts a valid course", () => {
@@ -128,5 +132,129 @@ describe("courseIdSchema", () => {
     expect(courseIdSchema.safeParse("0").success).toBe(false);
     expect(courseIdSchema.safeParse("-3").success).toBe(false);
     expect(courseIdSchema.safeParse("1.5").success).toBe(false);
+  });
+});
+
+describe("courseImportSchema", () => {
+  it("accepts a valid course export with modules and lessons", () => {
+    const result = courseImportSchema.safeParse({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "Real Estate",
+        description: "Fundamentals",
+        goal: "Invest confidently",
+        modules: [
+          {
+            title: "Basics",
+            description: "Getting started",
+            lessons: [
+              {
+                youtubeVideoId: "aaaaaaaaaaa",
+                title: "Intro",
+                channelName: "Some Channel",
+                durationSeconds: 600,
+                thumbnailUrl:
+                  "https://i.ytimg.com/vi/aaaaaaaaaaa/hqdefault.jpg",
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a wrong format marker", () => {
+    const data = {
+      format: "not-studyforge",
+      version: 1,
+      course: { title: "X", modules: [] },
+    };
+    expect(courseImportSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects an invalid youtube video id", () => {
+    const data = {
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "X",
+        modules: [{ title: "M", lessons: [{ youtubeVideoId: "nope" }] }],
+      },
+    };
+    expect(courseImportSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects a non-ytimg thumbnail url", () => {
+    const data = {
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "X",
+        modules: [
+          {
+            title: "M",
+            lessons: [
+              {
+                youtubeVideoId: "aaaaaaaaaaa",
+                thumbnailUrl: "https://evil.example.com/x.jpg",
+              },
+            ],
+          },
+        ],
+      },
+    };
+    expect(courseImportSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects export with more than 50 modules", () => {
+    const data = {
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "X",
+        modules: Array.from({ length: 51 }, (_, i) => ({
+          title: `M${i}`,
+          lessons: [],
+        })),
+      },
+    };
+    expect(courseImportSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects a module with more than 200 lessons", () => {
+    const data = {
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "X",
+        modules: [
+          {
+            title: "M",
+            lessons: Array.from({ length: 201 }, (_, i) => ({
+              youtubeVideoId: `aaaaaaaaaa${i % 10}${i % 11}`.slice(0, 11),
+            })),
+          },
+        ],
+      },
+    };
+    expect(courseImportSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("defaults a missing module description to empty", () => {
+    const result = courseImportSchema.safeParse({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "X",
+        modules: [{ title: "M", lessons: [] }],
+      },
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.course.modules[0].description).toBe("");
+    }
   });
 });

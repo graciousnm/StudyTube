@@ -234,6 +234,28 @@ Course completion shows whether the learner has reached the goal; course progres
 
 ---
 
+# 8b. Course Import and Export
+
+The learner can export a course as a portable JSON file and import it back.
+
+Export:
+
+- Available from the course actions menu (Edit / Export / Delete).
+- Produces a `.studyforge-course.json` file containing the course title, description, learning goal, and curriculum (modules and their lessons, including YouTube video IDs and metadata).
+- Contains curriculum only — never notes or progress.
+- Stores YouTube video IDs and metadata, never URLs or video content.
+
+Import:
+
+- Available from the "New Course" flow as an "Import a Course" option, next to manual and AI creation.
+- Always creates a new course; it never merges into an existing course.
+- Accepts only files in the StudyForge export format; anything else is rejected at the server boundary.
+- Recognizes the export format marker (`format: "studyforge-course"`), caps each import at 50 modules and 200 lessons per module, and rejects files larger than 5 MB.
+- Duplicate video IDs within a single module are skipped during import so the same video cannot be added twice to one module. Reuse of a video across modules (or across the library) remains allowed.
+- The file never touches the browser's database; it is parsed and validated server-side before any write.
+
+---
+
 # 9. Module Management
 
 The learner must be able to:
@@ -1062,6 +1084,8 @@ The V1 release should contain:
 - Delete
 - View
 - Progress
+- Import
+- Export
 
 ### Modules
 
@@ -1198,7 +1222,6 @@ Future versions may consider:
 - Learning reminders
 - Better playback analytics
 - Course sharing
-- Course import/export
 - Optional AI curriculum suggestions
 - Optional user accounts
 - Multi-device synchronization

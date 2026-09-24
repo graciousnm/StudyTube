@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@/components/ui/icons";
+import { PlusIcon, UploadIcon } from "@/components/ui/icons";
 import { Modal } from "@/components/ui/modal";
 import { CourseFormModal } from "@/features/courses/components/course-form-modal";
 import { createCourseAction } from "@/features/courses/course.actions";
@@ -13,6 +13,7 @@ import type { CurationPreferences } from "@/features/ai/components/curation-setu
 import { OutlineForm } from "@/features/ai/components/outline-form";
 import { OutlineReview } from "@/features/ai/components/outline-review";
 import { VideoCurationStep } from "@/features/ai/components/video-curation-step";
+import { ImportCourseModal } from "@/features/courses/components/import-course-modal";
 
 type Step = "choose" | "ai-form" | "ai-review" | "curation-setup" | "video-curation";
 
@@ -33,6 +34,7 @@ export function CreateCourseButton({
 }: CreateCourseButtonProps) {
   const router = useRouter();
   const [manualOpen, setManualOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [step, setStep] = useState<Step>("choose");
   const [outline, setOutline] = useState<CourseOutline | null>(null);
@@ -73,10 +75,6 @@ export function CreateCourseButton({
         size={size}
         className={className}
         onClick={() => {
-          if (!aiAvailable) {
-            setManualOpen(true);
-            return;
-          }
           setAiOpen(true);
           setStep("choose");
           setOutline(null);
@@ -115,19 +113,39 @@ export function CreateCourseButton({
               </button>
               <button
                 type="button"
-                onClick={() => setStep("ai-form")}
+                onClick={() => {
+                  setImportOpen(true);
+                  closeAi();
+                }}
                 className="flex w-full items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-900 p-4 text-left transition-colors hover:border-zinc-500 hover:bg-zinc-800"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10">
-                  <span className="text-lg">&#x2728;</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-800">
+                  <UploadIcon className="h-5 w-5 text-zinc-300" />
                 </div>
                 <div>
-                  <p className="font-medium text-zinc-100">Create with AI</p>
+                  <p className="font-medium text-zinc-100">Import a Course</p>
                   <p className="text-sm text-zinc-500">
-                    Get a suggested learning outline
+                    Load a StudyForge course export
                   </p>
                 </div>
               </button>
+              {aiAvailable ? (
+                <button
+                  type="button"
+                  onClick={() => setStep("ai-form")}
+                  className="flex w-full items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-900 p-4 text-left transition-colors hover:border-zinc-500 hover:bg-zinc-800"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand/10">
+                    <span className="text-lg">&#x2728;</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-zinc-100">Create with AI</p>
+                    <p className="text-sm text-zinc-500">
+                      Get a suggested learning outline
+                    </p>
+                  </div>
+                </button>
+              ) : null}
             </div>
           </div>
         )}
@@ -183,6 +201,11 @@ export function CreateCourseButton({
         action={createCourseAction}
         title="Create Course"
         submitLabel="Create Course"
+      />
+
+      <ImportCourseModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
       />
     </>
   );

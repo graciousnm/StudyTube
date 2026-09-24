@@ -1340,7 +1340,6 @@ Potential future requirements include:
 - Multi-user authorization
 - Course ownership
 - Sharing permissions
-- Import/export security
 - File upload security
 - Rate limiting
 - Audit logs
@@ -1348,6 +1347,22 @@ Potential future requirements include:
 - Multi-device synchronization
 
 These should be treated as new security domains rather than assumed extensions of V1.
+
+---
+
+# 74a. Course Import Security
+
+Course import accepts a JSON file uploaded by the learner. It is a V1 feature with the following security posture:
+
+- The file is read and validated entirely server-side; the browser never writes to the database.
+- Only the exact export format (`format: "studyforge-course"`) is accepted.
+- Every field is run through Zod at the server boundary:
+  - YouTube video IDs must match the 11-character video ID format.
+  - Thumbnail URLs must point to the ytimg.com CDN.
+  - Text fields are trimmed and length-capped (titles, descriptions, goals, module names).
+  - Counts are capped (50 modules, 200 lessons per module) and total file size is capped at 5 MB.
+- Imported content stores YouTube metadata and IDs only — never URLs to arbitrary hosts beyond the validated thumbnails, and never video content.
+- Import always creates a new course; it cannot overwrite or merge into existing data.
 
 ---
 

@@ -3,9 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/db/client";
-import { createCourse, deleteCourse, updateCourse } from "./course.mutations";
+import { listLessonsByModule } from "@/features/lessons/lesson.queries";
+import { listModulesByCourse } from "@/features/modules/module.queries";
+import {
+  COURSE_IMPORT_FORMAT,
+  MAX_IMPORT_JSON_BYTES,
+  courseIdSchema,
+  courseImportSchema,
+  parseCourseInput,
+} from "./course.validation";
+import {
+  createCourse,
+  createCourseWithModulesAndLessons,
+  deleteCourse,
+  updateCourse,
+} from "./course.mutations";
+import { getCourseById } from "./course.queries";
 import type { CourseActionState } from "./course.types";
-import { courseIdSchema, parseCourseInput } from "./course.validation";
 
 export async function createCourseAction(
   _prevState: CourseActionState,
@@ -66,4 +80,105 @@ export async function deleteCourseAction(
 
   revalidatePath("/");
   redirect("/");
+}
+
+export type ExportCourseResult =
+  | { ok: true; fileName: string; json: string }
+  | { ok: false; error: string };
+
+export async function exportCourseAction(
+  courseId: number,
+): Promise<ExportCourseResult> {
+  const parsedId = courseIdSchema.safeParse(courseId);
+  if (!parsedId.success) {
+    return { ok: false, error: "This course no longer exists." };
+  }
+
+  const db = getDb();
+  const course = getCourseById(db, parsedId.data);
+  if (!course) {
+    return { ok: false, error: "This course no longer exists." };
+  }
+
+  const modules = listModulesByCourse(db, course.id).map((module) => ({
+    title: module.title,
+    description: module.description,
+    lessons: listLessonsByModule(db, module.id).map((lesson) => ({
+      youtubeVideoId: lesson.youtube_video_id,
+      title: lesson.youtube_title,
+      channelId: lesson.youtube_channel_id,
+      channelName: lesson.youtube_channel_name,
+      thumbnailUrl: lesson.youtube_thumbnail_url,
+      durationSeconds: lesson.youtube_duration,
+      description: lesson.youtube_description,
+      publishedAt: lesson.youtube_published_at?.toISOString() ?? null,
+    })),
+  }));
+
+  const payload = {
+    format: COURSE_IMPORT_FORMAT,
+    version: 1,
+    course: {
+      title: course.title,
+      description: course.description,
+      goal: course.goal ?? undefined,
+      modules,
+    },
+  };
+
+  const safeName =
+    course.title.trim().replace(/[^a-z0-9-_]+/gi, "-").toLowerCase().slice(0, 80) ||
+    "course";
+
+  return {
+    ok: true,
+    fileName: `${safeName}.studyforge-course.json`,
+    json: JSON.stringify(payload, null, 2),
+  };
+}
+
+export interface ImportCourseState {
+  error?: string;
+}
+
+export async function importCourseAction(
+  _prevState: ImportCourseState,
+  formData: FormData,
+): Promise<ImportCourseState> {
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { error: "Choose a course file to import." };
+  }
+  if (file.size > MAX_IMPORT_JSON_BYTES) {
+    return { error: "The file is too large. Course exports are small JSON files." };
+  }
+
+  let text: string;
+  try {
+    text = await file.text();
+  } catch {
+    return { error: "The file could not be read." };
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { error: "The file is not valid JSON." };
+  }
+
+  const validated = courseImportSchema.safeParse(parsed);
+  if (!validated.success) {
+    return { error: "The file is not a valid StudyForge course export." };
+  }
+
+  const { course, skippedDuplicates } = createCourseWithModulesAndLessons(
+    getDb(),
+    validated.data.course,
+  );
+
+  revalidatePath("/");
+  redirect(
+    `/courses/${course.id}${skippedDuplicates ? `?imported=${skippedDuplicates}` : ""}`,
+  );
 }

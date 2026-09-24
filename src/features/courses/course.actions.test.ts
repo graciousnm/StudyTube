@@ -1,6 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { eq } from "drizzle-orm";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import {
   afterAll,
@@ -12,7 +13,7 @@ import {
   vi,
 } from "vitest";
 import { closeDb, createDb, getDb, type Db } from "@/db/client";
-import { courses } from "@/db/schema";
+import { courses, lessons, modules } from "@/db/schema";
 import { listCourses } from "./course.queries";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -219,5 +220,166 @@ describe("deleteCourseAction", () => {
   it("reports an error for an unknown course", async () => {
     const state = await actions.deleteCourseAction(999999);
     expect(state.error).toBeDefined();
+  });
+});
+
+describe("exportCourseAction", () => {
+  it("produces a serializable course export with modules and lessons", async () => {
+    await actions.createCourseAction(
+      {},
+      form("Real Estate", "Fundamentals", "Invest well"),
+    );
+    const courseId = onlyCourseId();
+
+    const handle = openDb();
+    const rows = handle.db
+      .select()
+      .from(courses)
+      .where(eq(courses.id, courseId))
+      .get()!;
+    const mod = handle.db
+      .insert(modules)
+      .values({ course_id: rows.id, title: "Basics", position: 1 })
+      .returning()
+      .get();
+    handle.db
+      .insert(lessons)
+      .values({
+        module_id: mod.id,
+        position: 1,
+        youtube_video_id: "aaaaaaaaaaa",
+        youtube_title: "Intro",
+        youtube_duration: 600,
+      })
+      .run();
+    handle.close();
+
+    const result = await actions.exportCourseAction(courseId);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    const payload = JSON.parse(result.json);
+    expect(payload.format).toBe("studyforge-course");
+    expect(payload.version).toBe(1);
+    expect(payload.course).toMatchObject({
+      title: "Real Estate",
+      description: "Fundamentals",
+      goal: "Invest well",
+    });
+    expect(payload.course.modules).toHaveLength(1);
+    expect(payload.course.modules[0]).toMatchObject({
+      title: "Basics",
+      lessons: [
+        { youtubeVideoId: "aaaaaaaaaaa", title: "Intro", durationSeconds: 600 },
+      ],
+    });
+    expect(result.fileName).toMatch(/\.studyforge-course\.json$/);
+  });
+
+  it("reports an error for an unknown or invalid course", async () => {
+    const unknown = await actions.exportCourseAction(999999);
+    expect(unknown.ok).toBe(false);
+
+    const invalid = await actions.exportCourseAction(Number.NaN);
+    expect(invalid.ok).toBe(false);
+  });
+});
+
+describe("importCourseAction", () => {
+  function fileInput(content: string, name = "export.studyforge-course.json") {
+    const data = new FormData();
+    data.set(
+      "file",
+      new File([content], name, { type: "application/json" }),
+    );
+    return data;
+  }
+
+  function emptyExport(course: Record<string, unknown>) {
+    return JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course,
+    });
+  }
+
+  it("imports a valid export as a new course and redirects", async () => {
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "Imported Course",
+        description: "From file",
+        goal: "Learn stuff",
+        modules: [
+          {
+            title: "Module A",
+            description: "A",
+            lessons: [
+              { youtubeVideoId: "aaaaaaaaaaa", title: "One", durationSeconds: 300 },
+              { youtubeVideoId: "bbbbbbbbbbb" },
+            ],
+          },
+        ],
+      },
+    });
+
+    await expectRedirect(actions.importCourseAction({}, fileInput(json)), /^REDIRECT:\/courses\/\d+/);
+
+    const handle = openDb();
+    const rows = listCourses(handle.db);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      title: "Imported Course",
+      description: "From file",
+      goal: "Learn stuff",
+    });
+    const mods = handle.db.select().from(modules).all();
+    expect(mods).toHaveLength(1);
+    expect(mods[0].title).toBe("Module A");
+    const lessonRows = handle.db.select().from(lessons).all();
+    expect(lessonRows).toHaveLength(2);
+    expect(lessonRows[0]).toMatchObject({
+      youtube_video_id: "aaaaaaaaaaa",
+      position: 1,
+    });
+    handle.close();
+  });
+
+  it("rejects a missing file", async () => {
+    const state = await actions.importCourseAction({}, new FormData());
+    expect(state.error).toBeDefined();
+  });
+
+  it("rejects non-JSON content", async () => {
+    const state = await actions.importCourseAction({}, fileInput("not json"));
+    expect(state.error).toBeDefined();
+  });
+
+  it("rejects an unknown export format", async () => {
+    const state = await actions.importCourseAction(
+      {},
+      fileInput(
+        JSON.stringify({ format: "other", version: 1, course: { title: "X" } }),
+      ),
+    );
+    expect(state.error).toBeDefined();
+
+    const handle = openDb();
+    expect(listCourses(handle.db)).toHaveLength(0);
+    handle.close();
+  });
+
+  it("rejects an oversized file", async () => {
+    const content = emptyExport({
+      title: "Big",
+      description: "x".repeat(6 * 1024 * 1024),
+    });
+    const state = await actions.importCourseAction({}, fileInput(content));
+    expect(state.error).toBeDefined();
+
+    const handle = openDb();
+    expect(listCourses(handle.db)).toHaveLength(0);
+    handle.close();
   });
 });

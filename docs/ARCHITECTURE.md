@@ -1424,7 +1424,6 @@ Potential future capabilities include:
 Additional content sources
 Accounts
 Multi-device synchronization
-Course import/export
 Practice activities
 AI-assisted learning
 Sharing

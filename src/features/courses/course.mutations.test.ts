@@ -6,6 +6,7 @@ import { courses, lessonProgress, lessons, modules, notes } from "@/db/schema";
 import {
   createCourse,
   createCourseWithModules,
+  createCourseWithModulesAndLessons,
   deleteCourse,
   updateCourse,
 } from "./course.mutations";
@@ -166,6 +167,94 @@ describe("course queries and mutations", () => {
       ).not.toThrow();
 
       expect(listCourses(db)).toHaveLength(1);
+    });
+  });
+
+  describe("createCourseWithModulesAndLessons", () => {
+    it("creates a course with modules, lessons, and ordering", () => {
+      const result = createCourseWithModulesAndLessons(db, {
+        title: "Worship Piano",
+        description: "Learn worship piano.",
+        goal: "Play confidently",
+        modules: [
+          {
+            title: "Basics",
+            description: "Fundamentals",
+            lessons: [
+              {
+                youtubeVideoId: "aaaaaaaaaaa",
+                title: "First",
+                durationSeconds: 120,
+              },
+              {
+                youtubeVideoId: "bbbbbbbbbbb",
+                title: "Second",
+              },
+            ],
+          },
+          {
+            title: "Chords",
+            description: "",
+            lessons: [],
+          },
+        ],
+      });
+
+      expect(result.course.title).toBe("Worship Piano");
+      expect(result.course.goal).toBe("Play confidently");
+      expect(result.modules).toHaveLength(2);
+      expect(result.modules[0].course_id).toBe(result.course.id);
+      expect(result.modules[0].position).toBe(1);
+      expect(result.modules[1].position).toBe(2);
+      expect(result.lessonCount).toBe(2);
+      expect(result.skippedDuplicates).toBe(0);
+
+      const lessonsRows = db
+        .select()
+        .from(lessons)
+        .all();
+      expect(lessonsRows).toHaveLength(2);
+      expect(lessonsRows[0]).toMatchObject({
+        module_id: result.modules[0].id,
+        position: 1,
+        youtube_video_id: "aaaaaaaaaaa",
+        youtube_duration: 120,
+      });
+      expect(lessonsRows[1]).toMatchObject({
+        position: 2,
+        youtube_video_id: "bbbbbbbbbbb",
+      });
+    });
+
+    it("skips duplicate video ids within a module", () => {
+      const result = createCourseWithModulesAndLessons(db, {
+        title: "Deduped",
+        description: "",
+        modules: [
+          {
+            title: "M",
+            description: "",
+            lessons: [
+              { youtubeVideoId: "aaaaaaaaaaa" },
+              { youtubeVideoId: "aaaaaaaaaaa" },
+              { youtubeVideoId: "bbbbbbbbbbb" },
+            ],
+          },
+        ],
+      });
+
+      expect(result.lessonCount).toBe(2);
+      expect(result.skippedDuplicates).toBe(1);
+
+      const lessonsRows = db
+        .select()
+        .from(lessons)
+        .all();
+      expect(lessonsRows.map((row) => row.youtube_video_id)).toEqual([
+        "aaaaaaaaaaa",
+        "bbbbbbbbbbb",
+      ]);
+      expect(lessonsRows.map((row) => row.position)).toEqual([1, 2]);
     });
   });
 });

@@ -313,7 +313,7 @@ The course page should emphasize:
 
 Avoid filling the page with unrelated statistics.
 
-The course header is a card. Course edit and delete are two matching ghost icon buttons in its top-right — a neutral hover for edit, a red hover for delete — vertically centered against the title; the Completed indicator sits at the card's bottom-right. The header ends with a structured progress section: a kicker row (`Progress` / lesson count) above a thin, full-width accent bar constrained to `max-w-xl`, with the Continue Learning button beneath it.
+The course header leads with the title. Course actions (Edit / Export / Delete) sit in a three-dot menu to the right of the title; the "Add module" button is on the opposite side. The header ends with the description, an optional Goal call-out, and the Completed indicator.
 
 Modules render as a card grid — two columns on tablet and three on large screens. Each card leads with a position pill and a `text-lg` title, with the description beneath; a progress row places the lesson count inline with a thin accent bar. A muted ghost delete sits in the card's top-right (reddening on hover), and move arrows live in a small-screens-only footer (see §17). A completed module may show a small Complete chip.
 
@@ -332,6 +332,11 @@ Learning goal (optional)
 ```
 
 Course create and edit open in a modal dialog (from the header/home and the course page), not a separate route. Module create and edit work the same way, from the course and module pages. The add-video flow stays a full page because search results and the video preview need the space.
+
+Import and export live inside these same flows rather than on their own pages:
+
+- The course actions menu (top-right of the course header) offers Edit / Export / Delete. Export triggers a direct `.studyforge-course.json` download of that course's curriculum (title, description, learning goal, modules, lessons).
+- The "New Course" flow's choice modal shows three options: Create Manually, Import a Course, and (when available) Create with AI. Import opens a modal with a file picker and a short explanation; the file is sent to the server, which validates it and redirects to the newly created course on success, or shows an error in place.
 
 Example:
 
