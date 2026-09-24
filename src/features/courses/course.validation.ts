@@ -12,6 +12,12 @@ export const courseInputSchema = z.object({
     .trim()
     .max(5000, "Description must be 5,000 characters or fewer.")
     .default(""),
+  goal: z
+    .string()
+    .trim()
+    .max(500, "Learning goal must be 500 characters or fewer.")
+    .optional()
+    .transform((value) => (value ? value : undefined)),
 });
 
 export const courseIdSchema = z.coerce.number().int().positive();
@@ -20,6 +26,7 @@ function readCourseInput(formData: FormData) {
   return {
     title: formData.get("title"),
     description: formData.get("description") ?? "",
+    goal: formData.get("goal") ?? "",
   };
 }
 
@@ -39,7 +46,7 @@ export function parseCourseInput(
   const fieldErrors: NonNullable<CourseActionState["fieldErrors"]> = {};
   for (const issue of parsed.error.issues) {
     const key = issue.path[0];
-    if (key === "title" || key === "description") {
+    if (key === "title" || key === "description" || key === "goal") {
       const messages = fieldErrors[key] ?? [];
       messages.push(issue.message);
       fieldErrors[key] = messages;

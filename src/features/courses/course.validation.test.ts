@@ -74,6 +74,40 @@ describe("courseInputSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("accepts an optional learning goal", () => {
+    const result = courseInputSchema.safeParse({
+      title: "Worship Piano",
+      goal: "Learn to play worship piano confidently",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.goal).toBe(
+        "Learn to play worship piano confidently",
+      );
+    }
+  });
+
+  it("treats a whitespace-only goal as absent", () => {
+    const result = courseInputSchema.safeParse({
+      title: "Worship Piano",
+      goal: "   ",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.goal).toBeUndefined();
+    }
+  });
+
+  it("rejects a goal longer than 500 characters", () => {
+    const result = courseInputSchema.safeParse({
+      title: "Course",
+      goal: "a".repeat(501),
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("courseIdSchema", () => {

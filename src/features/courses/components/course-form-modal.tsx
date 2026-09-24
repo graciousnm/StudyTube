@@ -7,7 +7,7 @@ interface CourseFormModalProps {
   open: boolean;
   onClose: () => void;
   action: CourseFormAction;
-  defaultValue?: { title: string; description: string };
+  defaultValue?: { title: string; description: string; goal?: string };
   title: string;
   submitLabel: string;
 }

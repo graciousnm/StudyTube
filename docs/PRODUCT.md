@@ -179,6 +179,7 @@ A course should contain:
 
 - Title
 - Description
+- Optional learning goal
 - Ordered modules
 
 ---
@@ -192,6 +193,12 @@ Title
 Description
 ```
 
+Optional:
+
+```text
+Learning goal
+```
+
 Example:
 
 ```text
@@ -200,6 +207,9 @@ Real Estate
 
 Description:
 Learn the fundamentals of real estate investing.
+
+Learning goal:
+Learn to play worship piano confidently.
 ```
 
 Course creation should be a simple operation.
@@ -207,6 +217,20 @@ Course creation should be a simple operation.
 No multi-step course wizard is required.
 
 Creating and editing a course happens in a modal dialog on the page the learner is already on (header, home, or course page), not on a separate route. Module create/edit works the same way from the course and module pages.
+
+---
+
+# 8a. Learning Goals
+
+A course may carry an optional learning goal describing what the learner wants to accomplish by completing it.
+
+The goal is:
+
+- Shown on the course page when present
+- Set and edited through the standard course create/edit modal
+- Free-form text, limited to 500 characters
+
+Course completion shows whether the learner has reached the goal; course progress is the derived `completed / total` value, and a course reaching 100% is considered complete. The goal itself is not measured automatically.
 
 ---
 

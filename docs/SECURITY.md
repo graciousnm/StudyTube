@@ -297,6 +297,7 @@ Examples:
 ```text
 Course title
 Course description
+Course learning goal
 Module title
 Lesson ID
 Course ID

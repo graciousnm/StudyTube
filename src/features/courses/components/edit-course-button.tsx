@@ -10,6 +10,7 @@ interface EditCourseButtonProps {
   courseId: number;
   title: string;
   description: string;
+  goal?: string;
   iconOnly?: boolean;
   open?: boolean;
   onClose?: () => void;
@@ -20,6 +21,7 @@ export function EditCourseButton({
   courseId,
   title,
   description,
+  goal,
   iconOnly = false,
   open: controlledOpen,
   onClose: controlledOnClose,
@@ -56,7 +58,7 @@ export function EditCourseButton({
         open={open}
         onClose={handleClose}
         action={updateCourseAction.bind(null, courseId)}
-        defaultValue={{ title, description }}
+        defaultValue={{ title, description, goal }}
         title="Edit Course"
         submitLabel="Save Changes"
       />

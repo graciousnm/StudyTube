@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Container } from "@/components/ui/container";
-import { LayersIcon } from "@/components/ui/icons";
+import { LayersIcon, TargetIcon } from "@/components/ui/icons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getDb } from "@/db/client";
 import { getCourseById } from "@/features/courses/course.queries";
@@ -68,21 +68,26 @@ export default async function CoursePage({ params }: CoursePageProps) {
               courseId={course.id}
               title={course.title}
               description={course.description}
+              goal={course.goal ?? undefined}
             />
           </div>
           <div className="shrink-0">
-            <div className="shrink-0">
-            <div className="shrink-0">
-            <div className="shrink-0">
             <AddModuleButton courseId={course.id} size="sm" />
-          </div>
-          </div>
-          </div>
           </div>
         </div>
 
         {course.description && (
           <p className="text-sm text-zinc-400">{course.description}</p>
+        )}
+
+        {course.goal && (
+          <div className="flex items-start gap-2 rounded-lg border border-brand/30 bg-brand/10 p-3 text-sm text-zinc-200">
+            <TargetIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+            <span>
+              <span className="font-medium text-zinc-100">Goal: </span>
+              {course.goal}
+            </span>
+          </div>
         )}
 
         {modules.length === 0 ? (

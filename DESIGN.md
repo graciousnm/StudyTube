@@ -282,6 +282,8 @@ Real Estate
 
 Introduction to real estate investing...
 
+🎯 Goal: Learn to play worship piano confidently.   [when set]
+
 ████████████░░░░░░ 62%
 
 12 of 19 lessons completed
@@ -304,6 +306,7 @@ The course page should emphasize:
 
 - Course title
 - Description
+- Optional learning goal
 - Overall progress
 - Continue Learning
 - Module structure
@@ -325,6 +328,7 @@ Minimum information:
 ```text
 Course title
 Description
+Learning goal (optional)
 ```
 
 Course create and edit open in a modal dialog (from the header/home and the course page), not a separate route. Module create and edit work the same way, from the course and module pages. The add-video flow stays a full page because search results and the video preview need the space.

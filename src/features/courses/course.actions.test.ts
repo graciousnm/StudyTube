@@ -33,10 +33,17 @@ function openDb(): { db: Db; close: () => void } {
   return createDb(databaseUrl);
 }
 
-function form(title: string, description: string): FormData {
+function form(
+  title: string,
+  description: string,
+  goal?: string,
+): FormData {
   const data = new FormData();
   data.set("title", title);
   data.set("description", description);
+  if (goal !== undefined) {
+    data.set("goal", goal);
+  }
   return data;
 }
 
@@ -109,6 +116,19 @@ describe("createCourseAction", () => {
     });
   });
 
+  it("persists an optional learning goal", async () => {
+    const state = await actions.createCourseAction(
+      {},
+      form("Worship Piano", "Chords and progressions.", "Play with confidence"),
+    );
+
+    expect(state).toEqual({});
+    const handle = openDb();
+    const rows = listCourses(handle.db);
+    handle.close();
+    expect(rows[0].goal).toBe("Play with confidence");
+  });
+
   it("returns field errors and persists nothing for invalid input", async () => {
     const state = await actions.createCourseAction({}, form("   ", "no title"));
 
@@ -143,6 +163,23 @@ describe("updateCourseAction", () => {
       title: "New Title",
       description: "Updated",
     });
+    handle.close();
+  });
+
+  it("updates a course learning goal", async () => {
+    await actions.createCourseAction({}, form("Old Title", ""));
+    const id = onlyCourseId();
+    vi.clearAllMocks();
+
+    const state = await actions.updateCourseAction(
+      id,
+      {},
+      form("Old Title", "", "New learning goal"),
+    );
+
+    expect(state).toEqual({});
+    const handle = openDb();
+    expect(listCourses(handle.db)[0].goal).toBe("New learning goal");
     handle.close();
   });
 

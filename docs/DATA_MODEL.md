@@ -95,6 +95,7 @@ JavaScript
 id
 title
 description
+goal
 created_at
 updated_at
 ```
@@ -132,6 +133,20 @@ Worship Piano
 Optional course description.
 
 May be empty.
+
+#### goal
+
+Optional learning goal set by the learner.
+
+May be empty or absent.
+
+Represents what the learner wants to accomplish by completing the course.
+
+Example:
+
+```text id="goal-ex"
+Learn to play worship piano confidently.
+```
 
 #### created_at
 

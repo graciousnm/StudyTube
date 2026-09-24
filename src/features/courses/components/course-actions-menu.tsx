@@ -10,12 +10,14 @@ interface CourseActionsMenuProps {
   courseId: number;
   title: string;
   description: string;
+  goal?: string;
 }
 
 export function CourseActionsMenu({
   courseId,
   title,
   description,
+  goal,
 }: CourseActionsMenuProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -33,6 +35,7 @@ export function CourseActionsMenu({
         courseId={courseId}
         title={title}
         description={description}
+        goal={goal}
         open={editOpen}
         onClose={() => setEditOpen(false)}
         hideTrigger

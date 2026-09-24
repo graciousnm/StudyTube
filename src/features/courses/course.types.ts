@@ -1,6 +1,7 @@
 export interface CourseInput {
   title: string;
   description: string;
+  goal?: string;
 }
 
 export interface CourseActionState {
@@ -8,5 +9,6 @@ export interface CourseActionState {
   fieldErrors?: {
     title?: string[];
     description?: string[];
+    goal?: string[];
   };
 }

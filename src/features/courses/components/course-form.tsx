@@ -14,7 +14,7 @@ export type CourseFormAction = (
 
 interface CourseFormProps {
   action: CourseFormAction;
-  defaultValue?: { title: string; description: string };
+  defaultValue?: { title: string; description: string; goal?: string };
   submitLabel: string;
   onSuccess?: () => void;
 }
@@ -38,6 +38,7 @@ export function CourseForm({
   }, {});
 
   const titleErrors = state?.fieldErrors?.title;
+  const goalErrors = state?.fieldErrors?.goal;
 
   return (
     <form action={formAction} className="space-y-5">
@@ -85,6 +86,34 @@ export function CourseForm({
           maxLength={5000}
           defaultValue={defaultValue?.description}
         />
+      </div>
+
+      <div className="space-y-1.5">
+        <label
+          htmlFor="course-goal"
+          className="block text-sm font-medium text-zinc-200"
+        >
+          Learning goal{" "}
+          <span className="font-normal text-zinc-500">(optional)</span>
+        </label>
+        <Textarea
+          id="course-goal"
+          name="goal"
+          placeholder="e.g. Learn to play worship piano confidently"
+          maxLength={500}
+          defaultValue={defaultValue?.goal}
+          aria-invalid={goalErrors ? true : undefined}
+          aria-describedby={goalErrors ? "course-goal-errors" : undefined}
+        />
+        {goalErrors ? (
+          <ul id="course-goal-errors" className="space-y-1">
+            {goalErrors.map((message) => (
+              <li key={message} className="text-sm text-red-400">
+                {message}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {state?.error ? (
