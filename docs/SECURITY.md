@@ -644,18 +644,17 @@ The player should not receive StudyForge server secrets.
 
 # 35. Content Security
 
-Where practical, production deployments should use appropriate browser security headers.
-
-Potential protections include:
+Production deployments use the browser security headers below, configured in `next.config.ts`.
 
 ```text
 Content-Security-Policy
 X-Content-Type-Options
 Referrer-Policy
 Permissions-Policy
+X-Frame-Options
 ```
 
-The exact policy must account for required YouTube embedding and application behavior.
+The policy explicitly accounts for required YouTube embedding and application behavior.
 
 Do not deploy an overly restrictive policy that breaks the core learning experience.
 
@@ -663,18 +662,13 @@ Do not deploy an overly restrictive policy that breaks the core learning experie
 
 # 36. Content Security Policy
 
-If a Content Security Policy is implemented, it should explicitly account for required StudyForge resources.
+StudyForge ships a pragmatic Content-Security-Policy header that covers the required StudyForge resources.
 
-At minimum, policy design should consider:
+The policy:
 
-```text
-Application origin
-YouTube player
-Required YouTube resources
-Styles
-Scripts
-Images
-```
+- Allows the application origin, YouTube's player script (`www.youtube.com`, `s.ytimg.com`), YouTube player frames (`youtube.com`, `youtube-nocookie.com`), thumbnails (`*.ytimg.com`), and inline styles.
+- Uses `'unsafe-inline'` for scripts to stay compatible with Next.js RSC hydration; this is a deliberate pragmatic trade-off and should not be relied on as the only injection defense.
+- Denies framing (`frame-ancestors 'none'`), objects, and unsupported base URIs.
 
 Do not use:
 
@@ -684,29 +678,25 @@ Do not use:
 
 as a blanket security policy.
 
-The final CSP should be tested against Learning Mode and YouTube playback.
+The CSP is tested against Learning Mode and YouTube playback in the manual browser pass.
 
 ---
 
 # 37. Clickjacking
 
-StudyForge should use appropriate response headers to prevent unauthorized framing of the application where compatible with the product.
+StudyForge sends `X-Frame-Options: DENY` to prevent unauthorized framing of the application.
 
-The application should not unnecessarily allow arbitrary third-party sites to embed the StudyForge UI.
+The application does not allow arbitrary third-party sites to embed the StudyForge UI.
 
 ---
 
 # 38. MIME Type Protection
 
-The application should prevent browsers from incorrectly interpreting returned content as another MIME type where appropriate.
-
-A standard:
+The application prevents browsers from incorrectly interpreting returned content as another MIME type by sending:
 
 ```text
 X-Content-Type-Options: nosniff
 ```
-
-policy may be used.
 
 ---
 
@@ -1129,20 +1119,17 @@ V1 does not require public backup management endpoints.
 
 # 64. Security Headers
 
-Production deployments should consider appropriate security headers.
-
-The exact set should be verified against the deployed application.
-
-Potential headers include:
+The application sends the following security headers (configured in `next.config.ts`):
 
 ```text
-X-Content-Type-Options
-Referrer-Policy
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: DENY
+Permissions-Policy: camera=(), microphone=(), geolocation=()
 Content-Security-Policy
-Permissions-Policy
 ```
 
-Do not blindly copy a generic security-header configuration without testing YouTube playback and application behavior.
+The header set is verified against the deployed application, including YouTube playback and application behavior.
 
 ---
 
