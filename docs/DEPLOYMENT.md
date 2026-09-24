@@ -118,14 +118,14 @@ This reduces unnecessary image size and attack surface.
 
 # 6. Node.js Runtime
 
-StudyForge should use a supported Node.js LTS release.
+StudyForge pins a supported Node.js LTS release: **Node.js 24 LTS** (`>=24 <25`).
 
-The exact version should be pinned consistently across:
+The exact version is pinned consistently across:
 
 ```text
-Local development
-CI
-Docker build
+Local development  (.nvmrc, engines)
+CI                 (engine-strict install)
+Docker build       (node:24 base image)
 Production
 ```
 

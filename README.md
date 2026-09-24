@@ -22,7 +22,7 @@ Build your own learning path. StudyTube turns scattered YouTube videos into stru
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24+ (LTS)
 - pnpm (recommended) or npm
 - A YouTube Data API v3 key ([get one here](https://console.cloud.google.com/apis/credentials))
 
