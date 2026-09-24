@@ -55,7 +55,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   return (
     <Container className="space-y-8">
       <Breadcrumbs
-        items={[{ label: "Courses", href: "/" }, { label: course.title }]}
+        items={[{ label: "Courses", href: "/courses" }, { label: course.title }]}
       />
 
       <section className="space-y-4">

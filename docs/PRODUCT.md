@@ -216,7 +216,7 @@ Course creation should be a simple operation.
 
 No multi-step course wizard is required.
 
-Creating and editing a course happens in a modal dialog on the page the learner is already on (header, home, or course page), not on a separate route. Module create/edit works the same way from the course and module pages.
+Creating and editing a course happens in a modal dialog on the page the learner is already on (header, courses page, or course page), not on a separate route. Module create/edit works the same way from the course and module pages. The header's global New Course control and the Courses page's in-page controls both open the same create flow.
 
 ---
 
@@ -773,18 +773,28 @@ Do not build a full document editor in V1.
 
 # 33. My Learning
 
-My Learning is the primary home for the learner.
+My Learning is the primary home for the learner. It is a focused dashboard: Welcome back, Continue Learning, and Recently studied. Browsing the full course list lives on the dedicated Courses page (`/courses`), not the home screen.
 
 It should show:
 
-- Courses
-- Current progress
 - Continue Learning
 - Recently accessed learning
 
 The most important item should be the learner's current learning activity.
 
-The home page shows a "Recently studied" section between Continue Learning and the course list. It lists up to three courses the learner has recently interacted with, ordered by the most recent lesson interaction, each with its last-studied date. A course counts as studied once any of its lessons has progress (watch position or completion).
+The home page shows a "Recently studied" section below Continue Learning. It lists up to three courses the learner has recently interacted with, ordered by the most recent lesson interaction, each with its last-studied date. A course counts as studied once any of its lessons has progress (watch position or completion). When there is no course to continue, the home page shows no Continue Learning banner.
+
+---
+
+# 33a. Courses Page
+
+A dedicated Courses page (`/courses`) is the library for the learner's courses. It lists every course with its completion progress, in curriculum order, and provides the primary create entry point:
+
+- A page header with the "Courses" title and the New Course control.
+- An empty state ("No courses yet") with a solid primary `Create Course` button when no course exists.
+- Course cards with progress, matching the grid used elsewhere in the app.
+
+The global New Course control in the app header and the in-page course controls open the same create flow (manual, import, or AI).
 
 ---
 

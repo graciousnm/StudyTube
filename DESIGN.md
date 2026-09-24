@@ -213,15 +213,15 @@ Recommended structure:
 ```text
 StudyForge
 
-My Learning
-Courses
+My Learning (/)
+Courses (/courses)
 In Progress
 Completed
 
 + New Course
 ```
 
-The exact implementation may be a sidebar, top navigation, or responsive combination depending on screen size.
+The exact implementation may be a sidebar, top navigation, or responsive combination depending on screen size. The app ships the first two destinations — Home/Hub ("My Learning") and the Courses library — in the header and mobile nav.
 
 Navigation must never dominate the learning content.
 
@@ -229,7 +229,7 @@ On smaller screens, navigation should collapse into a mobile-friendly pattern.
 
 Inner pages (course, module, add-video, lesson) show a breadcrumb trail — `Courses / Course / Module / …` — instead of a single Back link. The trail's current page is the last, non-linked item.
 
-The global New Course control in the app header uses the neutral outline (see §4) so the solid accent stays reserved for in-page primary actions; the home page's own New Course controls remain solid primary.
+The global New Course control in the app header uses the neutral outline (see §4) so the solid accent stays reserved for in-page primary actions; the Courses page's own New Course controls remain solid primary.
 
 When the installation has a local profile (see DATA_MODEL.md §44), the header also shows the learner's name with an avatar icon as a link to the Profile page. This is a local, single-installation designation — not an account — and it never dominates or clutters the navigation. Before a profile exists, the header shows no name and the home page prompts the name step instead (see §50).
 
@@ -237,7 +237,7 @@ When the installation has a local profile (see DATA_MODEL.md §44), the header a
 
 # 9. Home / My Learning
 
-The home screen should immediately communicate the learner's current learning state.
+The home screen should immediately communicate the learner's current learning state. It is a focused dashboard: course browsing lives on the dedicated Courses page (see §9a) rather than the home screen.
 
 Primary content:
 
@@ -256,9 +256,9 @@ Continue button
 Then:
 
 ```text
-My Courses
+Recently studied
 ────────────────────────────
-Course list
+Up to 3 course cards
 ```
 
 The most important action should be obvious:
@@ -268,6 +268,35 @@ The most important action should be obvious:
 Do not make the learner search through the interface to resume their current course.
 
 The home Continue Learning banner uses the standard banner card (see §12) — pill eyebrow, course title, module · lesson line, and the Progress section with a primary action — but keeps the soft accent skin so it remains the most prominent banner on the page.
+
+When there is no course to continue, the home screen shows no Continue Learning banner. Add or resume courses from the Courses page instead.
+
+---
+
+# 9a. Courses
+
+The Courses page (`/courses`) is the library the learner browses ("My Courses"). It lists every course in the app, each with its completion progress, in curriculum order:
+
+```text
+Courses                          [ + New Course ]
+
+────────────────────────────
+Course card · Course card · Course card
+```
+
+Primary content:
+
+```text
+Courses
+────────────────────────────
+Course list (with progress)
+```
+
+The most important action is creating the first course:
+
+When there are no courses, the page shows an empty state — a dashed card with "No courses yet" and a solid primary `Create Course` button.
+
+The header's global New Course control and the in-page Create Course button are the entry points; see §8.
 
 ---
 
@@ -1347,7 +1376,7 @@ Behavior:
 - The back link returns to `/`.
 - The input validates a trimmed string of 1–60 characters.
 - On submit, the action shows "Saving…" while the server creates the profile and redirects to `/`.
-- After success, the header now shows the name as the Profile entry and the home page empty state disappears.
+- After success, the header now shows the name as the Profile entry and the home page setup card disappears.
 - If a profile already exists, `/onboarding` redirects back to `/`.
 
 The onboarding page is intentionally not a setup wizard or multi-step flow.

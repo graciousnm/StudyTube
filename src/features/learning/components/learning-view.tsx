@@ -95,7 +95,7 @@ export function LearningView({
     <div className="space-y-6">
       <Breadcrumbs
         items={[
-          { label: "Courses", href: "/" },
+          { label: "Courses", href: "/courses" },
           { label: course.title, href: `/courses/${course.id}` },
           { label: module.title, href: moduleHref },
           { label: lesson.title },

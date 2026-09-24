@@ -52,15 +52,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </a>
           <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
             <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:gap-3">
-              <Link
-                href="/"
-                className="flex items-center gap-2 text-base font-semibold tracking-tight text-zinc-100"
-              >
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand text-white">
-                  <PlayIcon className="h-3 w-3" />
-                </span>
-                <span className="hidden sm:inline">StudyTube</span>
-              </Link>
+              <div className="flex items-center gap-5">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-base font-semibold tracking-tight text-zinc-100"
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand text-white">
+                    <PlayIcon className="h-3 w-3" />
+                  </span>
+                  <span className="hidden sm:inline">StudyTube</span>
+                </Link>
+                <nav aria-label="Primary navigation" className="hidden sm:block">
+                  <Link
+                    href="/courses"
+                    className="text-sm text-zinc-400 transition-colors hover:text-zinc-100"
+                  >
+                    Courses
+                  </Link>
+                </nav>
+              </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <CreateCourseButton size="sm" variant="secondary" aiAvailable={!!process.env.OPENROUTER_API_KEY} />
                 {profile ? <ProfileEntry name={profile.name} /> : null}

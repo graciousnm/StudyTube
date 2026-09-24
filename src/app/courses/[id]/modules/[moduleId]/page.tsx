@@ -75,7 +75,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
     <Container className="space-y-8">
       <Breadcrumbs
         items={[
-          { label: "Courses", href: "/" },
+          { label: "Courses", href: "/courses" },
           { label: course.title, href: `/courses/${course.id}` },
           { label: mod.title },
         ]}

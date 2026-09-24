@@ -45,7 +45,7 @@ export default async function AddVideoPage({ params }: AddVideoPageProps) {
       <div>
         <Breadcrumbs
           items={[
-            { label: "Courses", href: "/" },
+            { label: "Courses", href: "/courses" },
             { label: course.title, href: `/courses/${course.id}` },
             {
               label: mod.title,
