@@ -14,6 +14,7 @@ import {
 import {
   findLessonByVideoId,
   getLessonInModule,
+  listLessonsByModule,
 } from "@/features/lessons/lesson.queries";
 import type { LessonActionState, MoveDirection } from "@/features/lessons/lesson.types";
 import { lessonIdSchema } from "@/features/lessons/lesson.validation";
@@ -112,6 +113,20 @@ function resolveModule(courseId: number, moduleId: number) {
   return { course, mod };
 }
 
+function isValidReorderIds(ids: number[]): boolean {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return false;
+  }
+  const seen = new Set<number>();
+  for (const id of ids) {
+    if (!Number.isInteger(id) || id <= 0 || seen.has(id)) {
+      return false;
+    }
+    seen.add(id);
+  }
+  return true;
+}
+
 export async function addVideoToModuleAction(
   courseId: number,
   moduleId: number,
@@ -171,11 +186,22 @@ export async function reorderLessonsAction(
 
   const { mod } = resolved;
 
-  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+  if (!isValidReorderIds(orderedIds)) {
     return;
   }
 
-  reorderLessons(getDb(), mod.id, orderedIds);
+  const db = getDb();
+  const lessonIds = new Set(
+    listLessonsByModule(db, mod.id).map((lesson) => lesson.id),
+  );
+  if (
+    orderedIds.length !== lessonIds.size ||
+    orderedIds.some((id) => !lessonIds.has(id))
+  ) {
+    return;
+  }
+
+  reorderLessons(db, mod.id, orderedIds);
   revalidatePath(`/courses/${mod.course_id}/modules/${mod.id}`);
 }
 

@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { lessons, type Lesson } from "@/db/schema";
 import type { LessonCreateInput, MoveDirection } from "./lesson.types";
@@ -97,8 +97,24 @@ export function reorderLessons(
   db.transaction((tx) => {
     for (let i = 0; i < orderedIds.length; i++) {
       tx.update(lessons)
+        .set({ position: -(i + 1) })
+        .where(
+          and(
+            eq(lessons.id, orderedIds[i]),
+            eq(lessons.module_id, moduleId),
+          ),
+        )
+        .run();
+    }
+    for (let i = 0; i < orderedIds.length; i++) {
+      tx.update(lessons)
         .set({ position: i + 1 })
-        .where(eq(lessons.id, orderedIds[i]))
+        .where(
+          and(
+            eq(lessons.id, orderedIds[i]),
+            eq(lessons.module_id, moduleId),
+          ),
+        )
         .run();
     }
   });

@@ -12,7 +12,7 @@ import {
   reorderModules,
   updateModule,
 } from "./module.mutations";
-import { getModuleInCourse } from "./module.queries";
+import { getModuleInCourse, listModulesByCourse } from "./module.queries";
 import type { ModuleActionState, MoveDirection } from "./module.types";
 import { moduleIdSchema, parseModuleInput } from "./module.validation";
 
@@ -139,10 +139,35 @@ export async function reorderModulesAction(
     return;
   }
 
-  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+  if (!isValidReorderIds(orderedIds)) {
     return;
   }
 
-  reorderModules(getDb(), course.id, orderedIds);
+  const db = getDb();
+  const moduleIds = new Set(
+    listModulesByCourse(db, course.id).map((mod) => mod.id),
+  );
+  if (
+    orderedIds.length !== moduleIds.size ||
+    orderedIds.some((id) => !moduleIds.has(id))
+  ) {
+    return;
+  }
+
+  reorderModules(db, course.id, orderedIds);
   revalidatePath(`/courses/${course.id}`);
+}
+
+function isValidReorderIds(ids: number[]): boolean {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return false;
+  }
+  const seen = new Set<number>();
+  for (const id of ids) {
+    if (!Number.isInteger(id) || id <= 0 || seen.has(id)) {
+      return false;
+    }
+    seen.add(id);
+  }
+  return true;
 }

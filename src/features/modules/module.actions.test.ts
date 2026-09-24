@@ -207,3 +207,62 @@ describe("moveModuleAction", () => {
     expect(listModulesByCourse(getDb(), courseId)).toHaveLength(1);
   });
 });
+
+describe("reorderModulesAction", () => {
+  it("reorders modules within the course", async () => {
+    const a = createModule(getDb(), courseId, { title: "A", description: "" });
+    const b = createModule(getDb(), courseId, { title: "B", description: "" });
+    const c = createModule(getDb(), courseId, { title: "C", description: "" });
+
+    await actions.reorderModulesAction(courseId, [b.id, c.id, a.id]);
+
+    expect(
+      listModulesByCourse(getDb(), courseId).map((mod) => mod.title),
+    ).toEqual(["B", "C", "A"]);
+  });
+
+  it("ignores a reorder that includes a module from another course", async () => {
+    const a = createModule(getDb(), courseId, { title: "A", description: "" });
+    const b = createModule(getDb(), courseId, { title: "B", description: "" });
+    const otherCourseId = createCourse(getDb(), {
+      title: "Other",
+      description: "",
+    }).id;
+    const foreignModule = createModule(getDb(), otherCourseId, {
+      title: "Foreign",
+      description: "",
+    });
+
+    await actions.reorderModulesAction(courseId, [
+      foreignModule.id,
+      a.id,
+      b.id,
+    ]);
+
+    expect(
+      listModulesByCourse(getDb(), courseId).map((mod) => mod.title),
+    ).toEqual(["A", "B"]);
+    expect(listModulesByCourse(getDb(), otherCourseId)).toHaveLength(1);
+  });
+
+  it("ignores a reorder that omits a module from the course", async () => {
+    const a = createModule(getDb(), courseId, { title: "A", description: "" });
+    createModule(getDb(), courseId, { title: "B", description: "" });
+
+    await actions.reorderModulesAction(courseId, [a.id]);
+
+    expect(
+      listModulesByCourse(getDb(), courseId).map((mod) => mod.title),
+    ).toEqual(["A", "B"]);
+  });
+
+  it("ignores non-positive, non-integer, or duplicate ids", async () => {
+    createModule(getDb(), courseId, { title: "A", description: "" });
+    createModule(getDb(), courseId, { title: "B", description: "" });
+
+    await actions.reorderModulesAction(courseId, [0, -1, 1.5]);
+    await actions.reorderModulesAction(courseId, [1, 1]);
+
+    expect(listModulesByCourse(getDb(), courseId)).toHaveLength(2);
+  });
+});

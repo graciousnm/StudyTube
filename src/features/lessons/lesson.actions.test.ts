@@ -148,3 +148,65 @@ describe("moveLessonAction", () => {
     expect(listLessonsByModule(getDb(), otherModuleId)).toHaveLength(1);
   });
 });
+
+describe("reorderLessonsAction", () => {
+  it("reorders lessons within the module", async () => {
+    const first = addLesson("aaaaaaaaaaa");
+    const second = addLesson("bbbbbbbbbbb");
+    const third = addLesson("ccccccccccc");
+
+    await actions.reorderLessonsAction(courseId, moduleId, [
+      second.id,
+      third.id,
+      first.id,
+    ]);
+
+    expect(
+      listLessonsByModule(getDb(), moduleId).map((l) => l.youtube_video_id),
+    ).toEqual(["bbbbbbbbbbb", "ccccccccccc", "aaaaaaaaaaa"]);
+  });
+
+  it("ignores a reorder that includes a lesson from another module", async () => {
+    const first = addLesson("aaaaaaaaaaa");
+    const second = addLesson("bbbbbbbbbbb");
+    const otherModuleId = createModule(getDb(), courseId, {
+      title: "Other",
+      description: "",
+    }).id;
+    const foreignLesson = createLesson(getDb(), otherModuleId, {
+      youtube_video_id: "foreign12345",
+    });
+
+    await actions.reorderLessonsAction(courseId, moduleId, [
+      foreignLesson.id,
+      first.id,
+      second.id,
+    ]);
+
+    expect(
+      listLessonsByModule(getDb(), moduleId).map((l) => l.youtube_video_id),
+    ).toEqual(["aaaaaaaaaaa", "bbbbbbbbbbb"]);
+    expect(listLessonsByModule(getDb(), otherModuleId)).toHaveLength(1);
+  });
+
+  it("ignores a reorder that omits a lesson from the module", async () => {
+    const first = addLesson("aaaaaaaaaaa");
+    addLesson("bbbbbbbbbbb");
+
+    await actions.reorderLessonsAction(courseId, moduleId, [first.id]);
+
+    expect(
+      listLessonsByModule(getDb(), moduleId).map((l) => l.youtube_video_id),
+    ).toEqual(["aaaaaaaaaaa", "bbbbbbbbbbb"]);
+  });
+
+  it("ignores non-positive, non-integer, or duplicate ids", async () => {
+    addLesson("aaaaaaaaaaa");
+    addLesson("bbbbbbbbbbb");
+
+    await actions.reorderLessonsAction(courseId, moduleId, [0, -1, 1.5]);
+    await actions.reorderLessonsAction(courseId, moduleId, [1, 1]);
+
+    expect(listLessonsByModule(getDb(), moduleId)).toHaveLength(2);
+  });
+});
