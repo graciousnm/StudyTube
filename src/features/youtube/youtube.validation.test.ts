@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  youtubePageTokenSchema,
   youtubeSearchQuerySchema,
+  youtubeThumbnailUrlSchema,
   youtubeVideoIdSchema,
 } from "@/features/youtube/youtube.validation";
 
@@ -40,5 +42,56 @@ describe("youtubeVideoIdSchema", () => {
   it("rejects ids with invalid characters", () => {
     expect(youtubeVideoIdSchema.safeParse("dQw4w9WgXc!").success).toBe(false);
     expect(youtubeVideoIdSchema.safeParse("dQw4w9WgXc ").success).toBe(false);
+  });
+});
+
+describe("youtubePageTokenSchema", () => {
+  it("accepts a normal page token", () => {
+    expect(youtubePageTokenSchema.parse("EiAKGAE")).toBe("EiAKGAE");
+  });
+
+  it("trims surrounding whitespace", () => {
+    expect(youtubePageTokenSchema.parse("  EiAKGAE  ")).toBe("EiAKGAE");
+  });
+
+  it("rejects empty page tokens", () => {
+    expect(youtubePageTokenSchema.safeParse("").success).toBe(false);
+  });
+
+  it("rejects overlong page tokens", () => {
+    expect(
+      youtubePageTokenSchema.safeParse("x".repeat(513)).success,
+    ).toBe(false);
+  });
+});
+
+describe("youtubeThumbnailUrlSchema", () => {
+  it("accepts ytimg.com CDN URLs", () => {
+    const url = "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg";
+    expect(youtubeThumbnailUrlSchema.safeParse(url).success).toBe(true);
+  });
+
+  it("accepts bare ytimg.com host", () => {
+    expect(
+      youtubeThumbnailUrlSchema.safeParse("https://ytimg.com/vi/x/hq.jpg").success,
+    ).toBe(true);
+  });
+
+  it("rejects non-ytimg hosts", () => {
+    expect(
+      youtubeThumbnailUrlSchema.safeParse(
+        "https://evil.example.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      ).success,
+    ).toBe(false);
+    expect(
+      youtubeThumbnailUrlSchema.safeParse(
+        "https://youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      ).success,
+    ).toBe(false);
+  });
+
+  it("rejects non-URLs", () => {
+    expect(youtubeThumbnailUrlSchema.safeParse("not a url").success).toBe(false);
+    expect(youtubeThumbnailUrlSchema.safeParse("").success).toBe(false);
   });
 });

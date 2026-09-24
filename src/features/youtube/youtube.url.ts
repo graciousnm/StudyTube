@@ -47,6 +47,15 @@ function extractPlaylistId(raw: string): string | null {
     return null;
   }
 
+  const hostname = url.hostname.replace(/^www\./, "");
+  if (
+    hostname !== "youtube.com" &&
+    hostname !== "m.youtube.com" &&
+    hostname !== "youtu.be"
+  ) {
+    return null;
+  }
+
   const list = url.searchParams.get("list");
   if (list && /^[A-Za-z0-9_-]+$/.test(list)) {
     return list;

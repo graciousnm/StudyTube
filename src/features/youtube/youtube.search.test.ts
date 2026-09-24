@@ -170,6 +170,42 @@ describe("searchYouTube", () => {
     const { items: results } = await searchYouTube("learning");
     expect(JSON.stringify(results)).not.toContain("SUPERSECRETKEY");
   });
+
+  it("rejects thumbnails that are not served by ytimg.com", async () => {
+    process.env.YOUTUBE_API_KEY = "TESTKEY";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = new URL(String(input));
+        if (url.pathname.endsWith("/videos")) {
+          return new Response(JSON.stringify({ items: [] }), { status: 200 });
+        }
+        return new Response(
+          JSON.stringify({
+            items: [
+              {
+                id: { videoId: "aaaaaaaaaaa" },
+                snippet: {
+                  title: "Suspicious",
+                  thumbnails: {
+                    medium: {
+                      url: "https://evil.example.com/vi/aaaaaaaaaaa/mqdefault.jpg",
+                    },
+                  },
+                },
+              },
+            ],
+          }),
+          { status: 200 },
+        );
+      }),
+    );
+
+    const { items: results } = await searchYouTube("learning");
+
+    expect(results).toHaveLength(1);
+    expect(results[0].thumbnailUrl).toBeNull();
+  });
 });
 
 describe("getVideoMetadata", () => {

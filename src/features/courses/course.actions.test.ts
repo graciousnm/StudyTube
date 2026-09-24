@@ -155,6 +155,16 @@ describe("updateCourseAction", () => {
 
     expect(state.error).toBeDefined();
   });
+
+  it("reports an error for an invalid course id", async () => {
+    const state = await actions.updateCourseAction(
+      Number.NaN,
+      {},
+      form("Title", ""),
+    );
+
+    expect(state.error).toBeDefined();
+  });
 });
 
 describe("deleteCourseAction", () => {

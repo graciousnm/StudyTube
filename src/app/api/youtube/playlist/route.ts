@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { YouTubeError, youTubeErrorMessage } from "@/features/youtube/youtube.errors";
 import { getPlaylistItems } from "@/features/youtube/youtube.playlist";
+import { youtubePageTokenSchema } from "@/features/youtube/youtube.validation";
 import { z } from "zod";
 
 const playlistIdSchema = z
@@ -20,10 +21,19 @@ export async function GET(request: Request) {
     );
   }
 
-  const pageToken = searchParams.get("pageToken") ?? undefined;
+  const pageTokenParam = searchParams.get("pageToken") ?? "";
+  const parsedToken =
+    pageTokenParam === "" ? { success: true, data: undefined } :
+    youtubePageTokenSchema.safeParse(pageTokenParam);
+  if (!parsedToken.success) {
+    return NextResponse.json(
+      { error: "Invalid page token." },
+      { status: 400 },
+    );
+  }
 
   try {
-    const result = await getPlaylistItems(parsed.data, pageToken);
+    const result = await getPlaylistItems(parsed.data, parsedToken.data);
     return NextResponse.json(result, {
       headers: { "cache-control": "no-store" },
     });

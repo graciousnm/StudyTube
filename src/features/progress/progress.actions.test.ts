@@ -180,6 +180,15 @@ describe("savePlaybackPositionAction", () => {
     expect(getLessonProgress(getDb(), lesson.id)).toBeUndefined();
   });
 
+  it("rejects a position beyond the absolute cap", async () => {
+    const lesson = addLesson("aaaaaaaaaaa");
+
+    const state = await actions.savePlaybackPositionAction(lesson.id, 100_000, null);
+
+    expect(state.error).toBeDefined();
+    expect(getLessonProgress(getDb(), lesson.id)).toBeUndefined();
+  });
+
   it("reports an unknown lesson", async () => {
     const state = await actions.savePlaybackPositionAction(999999, 10, 600);
     expect(state.error).toBeDefined();

@@ -29,7 +29,11 @@ export async function updateCourseAction(
   _prevState: CourseActionState,
   formData: FormData,
 ): Promise<CourseActionState> {
+  const parsedId = courseIdSchema.safeParse(courseId);
   const parsed = parseCourseInput(formData);
+  if (!parsedId.success) {
+    return { error: "This course no longer exists." };
+  }
   if (!parsed.success) {
     return {
       error: "Please fix the highlighted fields.",
@@ -37,7 +41,7 @@ export async function updateCourseAction(
     };
   }
 
-  const course = updateCourse(getDb(), courseId, parsed.data);
+  const course = updateCourse(getDb(), parsedId.data, parsed.data);
   if (!course) {
     return { error: "This course no longer exists." };
   }

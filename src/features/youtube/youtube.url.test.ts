@@ -101,4 +101,12 @@ describe("extractPlaylistId", () => {
     expect(extractPlaylistId("not a url")).toBeNull();
     expect(extractPlaylistId("")).toBeNull();
   });
+
+  it("rejects list params on non-YouTube hosts", () => {
+    expect(
+      extractPlaylistId(
+        "https://evil.example.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+      ),
+    ).toBeNull();
+  });
 });

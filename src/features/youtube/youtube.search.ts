@@ -2,6 +2,7 @@ import { z } from "zod";
 import { parseIsoDuration, youtubeGet } from "./youtube.api";
 import { YouTubeError } from "./youtube.errors";
 import type { YouTubeVideo } from "./youtube.types";
+import { youtubeThumbnailUrlSchema } from "./youtube.validation";
 
 const SEARCH_MAX_RESULTS = 12;
 
@@ -41,17 +42,24 @@ const videosResponseSchema = z.object({
     .default([]),
 });
 
+function sanitizeThumbnail(url: string | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+  const parsed = youtubeThumbnailUrlSchema.safeParse(url);
+  return parsed.success ? parsed.data : null;
+}
+
 function bestThumbnail(
   thumbnails?: Record<string, { url: string }>,
 ): string | null {
   if (!thumbnails) {
     return null;
   }
-  return (
+  return sanitizeThumbnail(
     thumbnails.medium?.url ??
-    thumbnails.high?.url ??
-    thumbnails.default?.url ??
-    null
+      thumbnails.high?.url ??
+      thumbnails.default?.url,
   );
 }
 

@@ -3,6 +3,7 @@ import { youtubeGet } from "./youtube.api";
 import { YouTubeError } from "./youtube.errors";
 import { fetchDurations } from "./youtube.search";
 import type { YouTubeSearchResult } from "./youtube.types";
+import { youtubeThumbnailUrlSchema } from "./youtube.validation";
 
 const PLAYLIST_MAX_RESULTS = 50;
 
@@ -35,12 +36,15 @@ function bestThumbnail(
   if (!thumbnails) {
     return null;
   }
-  return (
+  const url =
     thumbnails.medium?.url ??
     thumbnails.high?.url ??
-    thumbnails.default?.url ??
-    null
-  );
+    thumbnails.default?.url;
+  if (!url) {
+    return null;
+  }
+  const parsed = youtubeThumbnailUrlSchema.safeParse(url);
+  return parsed.success ? parsed.data : null;
 }
 
 export async function getPlaylistItems(
