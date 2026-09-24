@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   courseOutlineSchema,
+  curateVideosInputSchema,
+  curatedVideosSchema,
   generateOutlineInputSchema,
+  searchQueriesSchema,
+  topicsWithResultsSchema,
 } from "./ai.validation";
 
 describe("generateOutlineInputSchema", () => {
@@ -154,5 +158,164 @@ describe("courseOutlineSchema", () => {
       expect(result.data.modules[0].description).toBe("Mod Desc");
       expect(result.data.modules[0].topics).toEqual(["Topic 1", "Topic 2"]);
     }
+  });
+});
+
+describe("curateVideosInputSchema", () => {
+  const validInput = {
+    courseTitle: "Worship Piano",
+    courseDescription: "Learn worship piano.",
+    modules: [
+      {
+        moduleId: 1,
+        title: "Basics",
+        topics: ["Posture", "Scales"],
+      },
+    ],
+  };
+
+  it("accepts a valid input", () => {
+    expect(curateVideosInputSchema.safeParse(validInput).success).toBe(true);
+  });
+
+  it("accepts optional channel and notes", () => {
+    const result = curateVideosInputSchema.safeParse({
+      ...validInput,
+      channel: "SomeChannel",
+      notes: "Prefer short videos.",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.channel).toBe("SomeChannel");
+      expect(result.data.notes).toBe("Prefer short videos.");
+    }
+  });
+
+  it("rejects a missing course title", () => {
+    const { courseTitle: _courseTitle, ...rest } = validInput;
+    void _courseTitle;
+    expect(curateVideosInputSchema.safeParse(rest).success).toBe(false);
+  });
+
+  it("rejects a module missing an id", () => {
+    const { moduleId: _moduleId, ...module } = validInput.modules[0];
+    void _moduleId;
+    expect(
+      curateVideosInputSchema.safeParse({
+        ...validInput,
+        modules: [module],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects more than 20 modules", () => {
+    const modules = Array.from({ length: 21 }, (_, i) => ({
+      moduleId: i + 1,
+      title: `Module ${i}`,
+      topics: ["Topic"],
+    }));
+    expect(
+      curateVideosInputSchema.safeParse({
+        ...validInput,
+        modules,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an over-long course title", () => {
+    expect(
+      curateVideosInputSchema.safeParse({
+        ...validInput,
+        courseTitle: "x".repeat(201),
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("searchQueriesSchema", () => {
+  it("accepts valid queries", () => {
+    const result = searchQueriesSchema.safeParse([
+      { moduleIndex: 0, topicIndex: 0, query: "worship piano tutorial" },
+    ]);
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an empty array", () => {
+    expect(searchQueriesSchema.safeParse([]).success).toBe(false);
+  });
+
+  it("rejects an over-long query", () => {
+    expect(
+      searchQueriesSchema.safeParse([
+        { moduleIndex: 0, topicIndex: 0, query: "x".repeat(201) },
+      ]).success,
+    ).toBe(false);
+  });
+
+  it("rejects non-integer indexes", () => {
+    expect(
+      searchQueriesSchema.safeParse([
+        { moduleIndex: -1, topicIndex: 0, query: "hello" },
+      ]).success,
+    ).toBe(false);
+  });
+});
+
+describe("topicsWithResultsSchema", () => {
+  const validResult = {
+    moduleIndex: 0,
+    topicIndex: 0,
+    query: "worship piano tutorial",
+    results: [
+      {
+        youtubeVideoId: "AAAAAAAAAAA",
+        title: "How to play worship piano",
+        channelName: "Piano Teacher",
+        durationSeconds: 600,
+      },
+    ],
+  };
+
+  it("accepts valid results", () => {
+    expect(topicsWithResultsSchema.safeParse([validResult]).success).toBe(true);
+  });
+
+  it("rejects an invalid video id", () => {
+    expect(
+      topicsWithResultsSchema.safeParse([
+        {
+          ...validResult,
+          results: [
+            {
+              youtubeVideoId: "js://not-youtube",
+              title: "Bad",
+              channelName: null,
+              durationSeconds: null,
+            },
+          ],
+        },
+      ]).success,
+    ).toBe(false);
+  });
+});
+
+describe("curatedVideosSchema", () => {
+  it("accepts valid videos", () => {
+    const result = curatedVideosSchema.safeParse([
+      { moduleId: 1, videoId: "AAAAAAAAAAA" },
+    ]);
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an empty array", () => {
+    expect(curatedVideosSchema.safeParse([]).success).toBe(false);
+  });
+
+  it("rejects an invalid video id", () => {
+    expect(
+      curatedVideosSchema.safeParse([
+        { moduleId: 1, videoId: "not-a-video-id" },
+      ]).success,
+    ).toBe(false);
   });
 });

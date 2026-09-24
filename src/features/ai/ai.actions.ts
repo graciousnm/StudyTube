@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { createCourseWithModules } from "@/features/courses/course.mutations";
+import { courseIdSchema } from "@/features/courses/course.validation";
 import { addVideoToModuleAction } from "@/features/lessons/lesson.actions";
 import { searchYouTube } from "@/features/youtube/youtube.search";
 import {
@@ -21,7 +22,11 @@ import type {
 } from "./ai.types";
 import {
   courseOutlineSchema,
+  curateVideosInputSchema,
+  curatedVideosSchema,
   generateOutlineInputSchema,
+  searchQueriesSchema,
+  topicsWithResultsSchema,
 } from "./ai.validation";
 
 export async function generateOutlineAction(
@@ -78,16 +83,13 @@ export async function createCourseFromOutlineAction(
 export async function generateSearchQueriesAction(
   input: CurateVideosInput,
 ): Promise<{ queries?: SearchQuery[]; error?: string }> {
-  if (
-    !input.courseTitle ||
-    input.modules.length === 0 ||
-    input.modules.some((m) => m.topics.length === 0)
-  ) {
+  const parsed = curateVideosInputSchema.safeParse(input);
+  if (!parsed.success) {
     return { error: "Invalid course data. Please try again." };
   }
 
   try {
-    const queries = await generateSearchQueries(input, 45_000);
+    const queries = await generateSearchQueries(parsed.data, 45_000);
     return { queries };
   } catch (error) {
     if (error instanceof AiProviderError) {
@@ -103,9 +105,14 @@ export async function generateSearchQueriesAction(
 export async function searchYouTubeBatchAction(
   queries: SearchQuery[],
 ): Promise<{ results?: TopicSearchResults[]; error?: string }> {
+  const parsed = searchQueriesSchema.safeParse(queries);
+  if (!parsed.success) {
+    return { error: "Invalid search data. Please try again." };
+  }
+
   try {
     const results = await Promise.all(
-      queries.map(async (q) => {
+      parsed.data.map(async (q) => {
         try {
           const { items: videos } = await searchYouTube(q.query);
           return {
@@ -141,8 +148,18 @@ export async function selectBestVideosAction(
   input: CurateVideosInput,
   topicsWithResults: TopicSearchResults[],
 ): Promise<{ selections?: VideoSelection[]; error?: string }> {
+  const parsedInput = curateVideosInputSchema.safeParse(input);
+  const parsedTopics = topicsWithResultsSchema.safeParse(topicsWithResults);
+  if (!parsedInput.success || !parsedTopics.success) {
+    return { error: "Invalid course data. Please try again." };
+  }
+
   try {
-    const selections = await selectBestVideos(input, topicsWithResults, 60_000);
+    const selections = await selectBestVideos(
+      parsedInput.data,
+      parsedTopics.data,
+      60_000,
+    );
     return { selections };
   } catch (error) {
     if (error instanceof AiProviderError) {
@@ -159,12 +176,22 @@ export async function addCuratedVideosAction(
   courseId: number,
   videos: { moduleId: number; videoId: string }[],
 ): Promise<{ added: number; errors: string[] }> {
+  const parsedVideos = curatedVideosSchema.safeParse(videos);
+  if (!parsedVideos.success) {
+    return { added: 0, errors: ["The video data was invalid. Please try again."] };
+  }
+
+  const parsedCourseId = courseIdSchema.safeParse(courseId);
+  if (!parsedCourseId.success) {
+    return { added: 0, errors: [] };
+  }
+
   const added: number[] = [];
   const errors: string[] = [];
 
-  for (const v of videos) {
+  for (const v of parsedVideos.data) {
     const result = await addVideoToModuleAction(
-      courseId,
+      parsedCourseId.data,
       v.moduleId,
       v.videoId,
     );
@@ -175,6 +202,6 @@ export async function addCuratedVideosAction(
     }
   }
 
-  revalidatePath(`/courses/${courseId}`);
+  revalidatePath(`/courses/${parsedCourseId.data}`);
   return { added: added.length, errors };
 }
