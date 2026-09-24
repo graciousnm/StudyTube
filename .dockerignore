@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+
+# next.js build output
+.next
+
+# database and local data
+data
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# git
+.git
+
+# test and coverage
+coverage
+playwright
+
+# misc
+.DS_Store
+*.log
+
+# editor
+.vscode
+
+# screenshots referenced by README (kept in Git, not needed in build context)
+public/screenshots

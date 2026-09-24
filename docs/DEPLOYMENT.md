@@ -77,42 +77,62 @@ StudyForge itself does not need to manage TLS termination.
 
 # 4. Docker
 
-StudyForge should provide a production Docker image.
+StudyForge ships a production Docker image built from the `Dockerfile` in the repository root.
 
-The Docker image should contain:
+The Docker image contains:
 
 - Production application code
 - Production dependencies
 - Required runtime
-- Built Next.js application
+- Built Next.js application (standalone output)
+- Database migrations
+- The startup migration script
 
-It should not contain:
+It does not contain:
 
 - Development secrets
 - YouTube API keys
 - R2 credentials
 - User-generated database state
 - Temporary development files
+- Development dependencies
+
+Build and run:
+
+```text
+docker build -t studyforge .
+docker run --rm -p 3000:3000 -v studyforge-data:/data studyforge
+```
+
+The container exposes port `3000` and persists the SQLite database under `/data`.
 
 ---
 
 # 5. Multi-Stage Docker Build
 
-The Dockerfile should use a multi-stage build where practical.
+The Dockerfile uses a multi-stage build.
 
-Conceptually:
+The stages are:
 
 ```text
-Dependencies
-      ↓
-Build
-      ↓
-Production Runtime
+deps       → production dependency tree (node:24-slim)
+builder    → full install + next build (standalone output)
+runner     → production runtime image
 ```
 
-The final runtime image should contain only what is required to run StudyForge.
+The final runtime image contains only what is required to run StudyForge:
+
+```text
+Standalone Next.js server
+Production node_modules
+Static assets and public files
+Database migrations
+migrate-on-boot.mjs
+```
 
 This reduces unnecessary image size and attack surface.
+
+The runtime image runs as a non-root user and writes only to `/data`.
 
 ---
 
@@ -455,17 +475,13 @@ Detailed diagnostics belong in server logs.
 
 # 23. Health Checks
 
-A simple health-check mechanism may be provided.
+The Docker image ships a `HEALTHCHECK` that requests `/` on the container's HTTP port. It determines whether the application is running.
 
-The purpose is to determine whether the application is running.
-
-A health check should not perform expensive operations.
-
-It should not:
+The health check does not:
 
 - Call YouTube
 - Perform a full database backup
-- Run migrations on every request
+- Run migrations (migrations run once at container start, before the server)
 - Perform expensive queries
 
 A basic application/database availability check is sufficient.
@@ -474,19 +490,19 @@ A basic application/database availability check is sufficient.
 
 # 24. Database Initialization
 
-Application startup must handle the expected database setup process predictably.
+Application startup handles the expected database setup process predictably.
 
-A production deployment should not silently create a database in an unexpected location.
+A production deployment does not silently create a database in an unexpected location.
 
-The database path should be explicit.
+The database path is explicit: `DATABASE_URL` (default `/data/learning.sqlite` inside the container).
 
-If migrations are required, they should be applied through the documented migration process.
+On container start, `scripts/migrate-on-boot.mjs` runs before the application and applies any pending Drizzle migrations to the configured database. The application itself does not run migrations on requests.
 
 ---
 
 # 25. Database Migrations
 
-Schema changes must use Drizzle migrations.
+Schema changes use Drizzle migrations.
 
 Do not modify the production SQLite schema manually unless performing a documented emergency recovery procedure.
 
@@ -503,6 +519,8 @@ Test migration
       ↓
 Deploy migration
 ```
+
+A deployed migration is applied automatically by `scripts/migrate-on-boot.mjs` at the start of the new container. Because migrations are run ahead of the server, no schema change is ever applied lazily on a request.
 
 ---
 
@@ -526,7 +544,7 @@ Destructive migrations require particular care.
 
 # 27. Fresh Installation
 
-A fresh installation should follow:
+A fresh installation follows:
 
 ```text
 Deploy application
@@ -535,20 +553,20 @@ Configure environment
       ↓
 Configure persistent storage
       ↓
-Initialize database
+Initialize database        (automatic: migrate-on-boot on first start)
       ↓
-Run migrations
+Run migrations             (automatic, same step)
       ↓
 Open StudyForge
 ```
 
-The exact command sequence should be documented in the repository's deployment instructions.
+No manual database step is required: the first container start creates and migrates the database at `DATABASE_URL`.
 
 ---
 
 # 28. Existing Installation Update
 
-An application update should follow:
+An application update follows:
 
 ```text
 Backup database
@@ -557,9 +575,7 @@ Pull new version
       ↓
 Build new container
       ↓
-Apply migrations
-      ↓
-Start application
+Start new container        (migrate-on-boot applies pending migrations)
       ↓
 Verify application
 ```

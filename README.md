@@ -58,11 +58,28 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Database
 
-Migrations run automatically on startup. To seed sample data:
+Run pending migrations before starting the app:
+
+```bash
+pnpm db:migrate
+```
+
+To seed sample data:
 
 ```bash
 pnpm seed
 ```
+
+In Docker, migrations run automatically on container start.
+
+### Docker
+
+```bash
+docker build -t studyforge .
+docker run --rm -p 3000:3000 -v studyforge-data:/data studyforge
+```
+
+The container applies pending migrations on first start and keeps the SQLite database on the `/data` volume.
 
 ## Tech Stack
 
