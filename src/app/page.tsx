@@ -12,7 +12,8 @@ import {
   getCourseProgressMap,
 } from "@/features/progress/progress.queries";
 import { CompleteStepButton } from "@/features/profile/components/complete-step-button";
-import { getProfile } from "@/features/profile/profile.queries";
+import { RecentlyStudiedSection } from "@/features/profile/components/recently-studied-section";
+import { getProfile, getRecentlyStudiedCourses } from "@/features/profile/profile.queries";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default function HomePage() {
   const continueLearning = getContinueLearning(db);
   const progressByCourse = getCourseProgressMap(db);
   const thumbnailMap = getFirstLessonThumbnails(db);
+  const recentlyStudied = getRecentlyStudiedCourses(db, 3);
   const aiAvailable = !!process.env.OPENROUTER_API_KEY;
 
   return (
@@ -42,6 +44,12 @@ export default function HomePage() {
           }
         />
       ) : null}
+
+      <RecentlyStudiedSection
+        items={recentlyStudied}
+        progressByCourse={progressByCourse}
+        thumbnailMap={thumbnailMap}
+      />
 
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">

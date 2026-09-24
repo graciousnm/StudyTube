@@ -14,10 +14,35 @@ import { getCourseProgressMap } from "@/features/progress/progress.queries";
 import type {
   CourseProgressEntry,
   LearnerStats,
+  RecentlyStudiedCourse,
 } from "./profile.types";
 
 export function getProfile(db: Db): Profile | undefined {
   return db.select().from(profile).where(eq(profile.id, 1)).get();
+}
+
+export function getRecentlyStudiedCourses(
+  db: Db,
+  limit = 3,
+): RecentlyStudiedCourse[] {
+  const rows = db
+    .select({
+      course: courses,
+      lastStudiedAt: sql<number>`max(${lessonProgress.updated_at})`,
+    })
+    .from(lessonProgress)
+    .innerJoin(lessons, eq(lessonProgress.lesson_id, lessons.id))
+    .innerJoin(modules, eq(lessons.module_id, modules.id))
+    .innerJoin(courses, eq(modules.course_id, courses.id))
+    .groupBy(courses.id)
+    .orderBy(desc(sql`max(${lessonProgress.updated_at})`))
+    .limit(limit)
+    .all();
+
+  return rows.map((row) => ({
+    course: row.course,
+    lastStudiedAt: row.lastStudiedAt,
+  }));
 }
 
 export function getLearnerStats(db: Db): LearnerStats {

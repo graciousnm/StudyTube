@@ -12,7 +12,11 @@ import {
   savePlaybackPosition,
 } from "@/features/progress/progress.mutations";
 import { createProfile, updateProfileName } from "./profile.mutations";
-import { getLearnerStats, getProfile } from "./profile.queries";
+import {
+  getLearnerStats,
+  getProfile,
+  getRecentlyStudiedCourses,
+} from "./profile.queries";
 
 let db: Db;
 let close: () => void;
@@ -236,3 +240,66 @@ describe("getLearnerStats", () => {
     expect(stats.mostCurrent?.title).toBe("Newer");
   });
 });
+
+describe("getRecentlyStudiedCourses", () => {
+  it("returns nothing when no course has been touched", () => {
+    expect(getRecentlyStudiedCourses(db)).toEqual([]);
+  });
+
+  it("orders courses by most recent lesson interaction", () => {
+    const older = makeCourse("Older");
+    const olderModule = makeModule(older.id, "Module");
+    const olderLesson = makeLesson(olderModule.id, "aaaaaaaaaaa");
+    watch(olderLesson.id, 10);
+    backdate(olderLesson.id, 9);
+
+    const newer = makeCourse("Newer");
+    const newerModule = makeModule(newer.id, "Module");
+    const newerLesson = makeLesson(newerModule.id, "bbbbbbbbbbb");
+    complete(newerLesson);
+    backdate(newerLesson.id, 1);
+
+    const untouched = makeCourse("Untouched");
+
+    const items = getRecentlyStudiedCourses(db);
+    expect(items.map((i) => i.course.title)).toEqual(["Newer", "Older"]);
+    expect(items[0].course.id).toBe(newer.id);
+    expect(items[1].course.id).toBe(older.id);
+    expect(items.some((i) => i.course.id === untouched.id)).toBe(false);
+    expect(items[0].lastStudiedAt).toBe(
+      newerLessonProgressValue(newerLesson.id),
+    );
+  });
+
+  it("lists each course only once regardless of interaction count", () => {
+    const course = makeCourse("Busy");
+    const mod = makeModule(course.id, "Module");
+    watch(makeLesson(mod.id, "aaaaaaaaaaa").id, 10);
+    watch(makeLesson(mod.id, "bbbbbbbbbbb").id, 20);
+
+    const items = getRecentlyStudiedCourses(db);
+    expect(items).toHaveLength(1);
+    expect(items[0].course.title).toBe("Busy");
+  });
+
+  it("respects the limit", () => {
+    const first = makeCourse("First");
+    const firstModule = makeModule(first.id, "Module");
+    watch(makeLesson(firstModule.id, "aaaaaaaaaaa").id, 10);
+
+    const second = makeCourse("Second");
+    const secondModule = makeModule(second.id, "Module");
+    watch(makeLesson(secondModule.id, "bbbbbbbbbbb").id, 10);
+
+    expect(getRecentlyStudiedCourses(db, 1)).toHaveLength(1);
+  });
+});
+
+function newerLessonProgressValue(lessonId: number): number {
+  const row = db
+    .select({ updatedAt: lessonProgress.updated_at })
+    .from(lessonProgress)
+    .where(eq(lessonProgress.lesson_id, lessonId))
+    .get();
+  return row?.updatedAt.getTime() ?? 0;
+}

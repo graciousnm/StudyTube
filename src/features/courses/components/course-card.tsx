@@ -10,9 +10,15 @@ interface CourseCardProps {
   course: Course;
   progress: ProgressSummary;
   thumbnailUrl?: string | null;
+  footer?: string;
 }
 
-export function CourseCard({ course, progress, thumbnailUrl }: CourseCardProps) {
+export function CourseCard({
+  course,
+  progress,
+  thumbnailUrl,
+  footer,
+}: CourseCardProps) {
   return (
     <li className="h-full">
       <Link
@@ -53,6 +59,7 @@ export function CourseCard({ course, progress, thumbnailUrl }: CourseCardProps) 
               label={progressLabel(progress)}
             />
             <p className="mt-2 text-sm text-zinc-400">{progressLabel(progress)}</p>
+            {footer ? <p className="mt-1 text-xs text-zinc-500">{footer}</p> : null}
           </div>
         </div>
       </Link>

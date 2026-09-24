@@ -1,3 +1,4 @@
+import type { Course } from "@/db/schema";
 import type { ProgressSummary } from "@/features/progress/progress.types";
 
 export interface ProfileActionState {
@@ -34,4 +35,9 @@ export interface LearnerStats {
         title: string;
       }
     | undefined;
+}
+
+export interface RecentlyStudiedCourse {
+  course: Course;
+  lastStudiedAt: number;
 }

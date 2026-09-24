@@ -760,6 +760,8 @@ It should show:
 
 The most important item should be the learner's current learning activity.
 
+The home page shows a "Recently studied" section between Continue Learning and the course list. It lists up to three courses the learner has recently interacted with, ordered by the most recent lesson interaction, each with its last-studied date. A course counts as studied once any of its lessons has progress (watch position or completion).
+
 ---
 
 # 34. In Progress
