@@ -1257,7 +1257,7 @@ Before a production release:
 [ ] R2 credentials server-side
 [ ] Safe error messages
 [ ] Production HTTPS enabled
-[ ] Security headers reviewed
+[x] Security headers reviewed
 [ ] Docker image reviewed
 [ ] Dependencies reviewed
 [ ] Backup storage private
