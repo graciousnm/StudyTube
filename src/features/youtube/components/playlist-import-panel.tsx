@@ -4,8 +4,7 @@ import { useCallback, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "@/components/ui/icons";
-import { Input } from "@/components/ui/input";
+import { LayersIcon, PlusIcon } from "@/components/ui/icons";
 import { extractPlaylistId } from "@/features/youtube/youtube.url";
 import { addVideosToModuleAction } from "@/features/lessons/lesson.actions";
 import type { YouTubeSearchResult } from "@/features/youtube/youtube.types";
@@ -203,15 +202,21 @@ export function PlaylistImportPanel({
           e.preventDefault();
           handleFetch();
         }}
-        className="flex items-start gap-2"
+        className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-1.5 pl-3.5 transition focus-within:border-zinc-600 focus-within:ring-2 focus-within:ring-brand/30"
       >
-        <Input
+        <LayersIcon className="h-5 w-5 shrink-0 text-zinc-500" />
+        <input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="Paste a YouTube playlist URL…"
-          className="max-w-2xl h-11 text-base"
+          aria-label="YouTube playlist URL"
+          className="h-11 w-full min-w-0 flex-1 bg-transparent text-base text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
         />
-        <Button type="submit" disabled={!playlistId || fetchState.loading}>
+        <Button
+          type="submit"
+          className="shrink-0"
+          disabled={!playlistId || fetchState.loading}
+        >
           {fetchState.loading ? "Loading…" : "Fetch Playlist"}
         </Button>
       </form>

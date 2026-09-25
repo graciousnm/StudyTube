@@ -1,8 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 interface TabItem<T extends string> {
   key: T;
   label: string;
+  icon?: ReactNode;
 }
 
 interface TabBarProps<T extends string> {
@@ -17,18 +20,19 @@ export function TabBar<T extends string>({
   onChange,
 }: TabBarProps<T>) {
   return (
-    <div className="flex gap-1 rounded-lg border border-zinc-800 bg-zinc-900 p-1">
+    <div className="inline-flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900 p-1">
       {tabs.map((tab) => (
         <button
           key={tab.key}
           type="button"
           onClick={() => onChange(tab.key)}
-          className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
             active === tab.key
-              ? "bg-zinc-700 text-zinc-100"
-              : "text-zinc-400 hover:text-zinc-200"
+              ? "bg-brand-soft text-brand"
+              : "text-zinc-400 hover:text-zinc-100"
           }`}
         >
+          {tab.icon}
           {tab.label}
         </button>
       ))}

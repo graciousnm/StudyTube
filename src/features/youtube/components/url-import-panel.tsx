@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, PlusIcon } from "@/components/ui/icons";
-import { Input } from "@/components/ui/input";
+import { CheckIcon, LinkIcon, PlusIcon } from "@/components/ui/icons";
 import { addVideoByUrlAction } from "@/features/lessons/lesson.actions";
 
 interface UrlImportPanelProps {
@@ -45,25 +44,36 @@ export function UrlImportPanel({ courseId, moduleId }: UrlImportPanelProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-start gap-2">
-      <Input
-        value={url}
-        onChange={(e) => {
-          setUrl(e.target.value);
-          setResult(null);
-        }}
-        placeholder="Paste a YouTube video URL…"
-        className="max-w-2xl h-11 text-base"
-      />
-      <Button type="submit" disabled={pending || url.trim().length === 0}>
-        <PlusIcon className="h-4 w-4" />
-        {pending ? "Adding…" : "Add to Module"}
-      </Button>
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-1.5 pl-3.5 transition focus-within:border-zinc-600 focus-within:ring-2 focus-within:ring-brand/30"
+      >
+        <LinkIcon className="h-5 w-5 shrink-0 text-zinc-500" />
+        <input
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setResult(null);
+          }}
+          placeholder="Paste a YouTube video URL…"
+          aria-label="YouTube video URL"
+          className="h-11 w-full min-w-0 flex-1 bg-transparent text-base text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
+        />
+        <Button
+          type="submit"
+          className="shrink-0"
+          disabled={pending || url.trim().length === 0}
+        >
+          <PlusIcon className="h-4 w-4" />
+          {pending ? "Adding…" : "Add to Module"}
+        </Button>
+      </form>
       {result?.error ? (
         <p role="alert" className="mt-2 text-sm text-red-400">
           {result.error}
         </p>
       ) : null}
-    </form>
+    </>
   );
 }

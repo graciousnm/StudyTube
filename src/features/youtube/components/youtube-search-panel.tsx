@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, CloseIcon, SearchIcon } from "@/components/ui/icons";
+import {
+  CheckIcon,
+  CloseIcon,
+  LayersIcon,
+  LinkIcon,
+  SearchIcon,
+} from "@/components/ui/icons";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabBar } from "@/components/ui/tabs";
 import { AddVideoButton } from "@/features/youtube/components/add-video-button";
@@ -16,10 +21,14 @@ import { formatDuration } from "@/lib/format";
 
 type TabKey = "search" | "url" | "playlist";
 
-const tabs: { key: TabKey; label: string }[] = [
-  { key: "search", label: "Search" },
-  { key: "url", label: "Import URL" },
-  { key: "playlist", label: "Import Playlist" },
+const tabs: { key: TabKey; label: string; icon: ReactNode }[] = [
+  { key: "search", label: "Search", icon: <SearchIcon className="h-4 w-4" /> },
+  { key: "url", label: "Import URL", icon: <LinkIcon className="h-4 w-4" /> },
+  {
+    key: "playlist",
+    label: "Import Playlist",
+    icon: <LayersIcon className="h-4 w-4" />,
+  },
 ];
 
 interface YouTubeSearchPanelProps {
@@ -119,18 +128,23 @@ export function YouTubeSearchPanel({
       <div className="mt-4">
         {activeTab === "search" ? (
           <>
-            <form onSubmit={handleSearch} className="flex items-start gap-2">
-              <Input
+            <form
+              onSubmit={handleSearch}
+              className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 p-1.5 pl-3.5 transition focus-within:border-zinc-600 focus-within:ring-2 focus-within:ring-brand/30"
+            >
+              <SearchIcon className="h-5 w-5 shrink-0 text-zinc-500" />
+              <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search YouTube…"
-                className="max-w-2xl h-11 text-base"
+                aria-label="Search YouTube"
+                className="h-11 w-full min-w-0 flex-1 bg-transparent text-base text-zinc-100 placeholder:text-zinc-500 focus:outline-none"
               />
               <Button
                 type="submit"
+                className="shrink-0"
                 disabled={loading || query.trim().length === 0}
               >
-                <SearchIcon className="h-4 w-4" />
                 Search
               </Button>
             </form>
