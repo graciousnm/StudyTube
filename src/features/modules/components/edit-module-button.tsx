@@ -11,6 +11,9 @@ interface EditModuleButtonProps {
   title: string;
   description: string;
   iconOnly?: boolean;
+  open?: boolean;
+  onClose?: () => void;
+  hideTrigger?: boolean;
 }
 
 export function EditModuleButton({
@@ -18,30 +21,39 @@ export function EditModuleButton({
   title,
   description,
   iconOnly = false,
+  open: controlledOpen,
+  onClose: controlledOnClose,
+  hideTrigger = false,
 }: EditModuleButtonProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = controlledOnClose
+    ? (value: boolean) => (value ? controlledOnClose() : controlledOnClose())
+    : setInternalOpen;
+  const handleClose = controlledOnClose ?? (() => setInternalOpen(false));
 
   return (
     <>
-      {iconOnly ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setOpen(true)}
-          aria-label="Edit module"
-          title="Edit module"
-        >
-          <PencilIcon className="h-4 w-4" />
-        </Button>
-      ) : (
-        <Button variant="secondary" onClick={() => setOpen(true)}>
-          <PencilIcon className="h-4 w-4" />
-          Edit
-        </Button>
-      )}
+      {!hideTrigger &&
+        (iconOnly ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(true)}
+            aria-label="Edit module"
+            title="Edit module"
+          >
+            <PencilIcon className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button variant="secondary" onClick={() => setOpen(true)}>
+            <PencilIcon className="h-4 w-4" />
+            Edit
+          </Button>
+        ))}
       <ModuleFormModal
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         action={updateModuleAction.bind(null, moduleId)}
         defaultValue={{ title, description }}
         title="Edit Module"

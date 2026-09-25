@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { ConfirmDeleteButton } from "@/components/ui/confirm-delete-button";
 import { Container } from "@/components/ui/container";
 import { PlusIcon } from "@/components/ui/icons";
 import { PlayIcon } from "@/components/ui/icons";
@@ -13,7 +12,7 @@ import { getCourseById } from "@/features/courses/course.queries";
 import { courseIdSchema } from "@/features/courses/course.validation";
 import { LessonGrid } from "@/features/lessons/components/lesson-grid";
 import { listLessonsByModule } from "@/features/lessons/lesson.queries";
-import { deleteModuleAction } from "@/features/modules/module.actions";
+import { ModuleActionsMenu } from "@/features/modules/components/module-actions-menu";
 import { getModuleInCourse } from "@/features/modules/module.queries";
 import { moduleIdSchema } from "@/features/modules/module.validation";
 import { getLessonProgressMap } from "@/features/progress/progress.queries";
@@ -87,13 +86,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <h1 className="min-w-0 truncate text-2xl font-semibold tracking-tight text-zinc-100">
               {mod.title}
             </h1>
-            <ConfirmDeleteButton
-              iconOnly
-              triggerLabel="Delete module"
-              heading="Delete Module?"
-              description={`This will permanently remove "${mod.title}" and all of its lessons, progress, and notes.`}
-              confirmLabel="Delete Module"
-              action={deleteModuleAction.bind(null, course.id, mod.id)}
+            <ModuleActionsMenu
+              courseId={course.id}
+              moduleId={mod.id}
+              title={mod.title}
+              description={mod.description}
             />
           </div>
           <Link
@@ -105,6 +102,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <span className="hidden sm:inline">Add YouTube Video</span>
           </Link>
         </div>
+
+        {mod.description && (
+          <p className="text-sm text-zinc-400">{mod.description}</p>
+        )}
 
         {lessons.length === 0 ? (
           <EmptyState

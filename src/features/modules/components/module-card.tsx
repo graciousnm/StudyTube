@@ -3,11 +3,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { ConfirmDeleteButton } from "@/components/ui/confirm-delete-button";
 import { CheckIcon, GripVerticalIcon } from "@/components/ui/icons";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import type { Module } from "@/db/schema";
-import { deleteModuleAction } from "@/features/modules/module.actions";
 import { progressLabel } from "@/features/progress/progress.calculations";
 import type { ProgressSummary } from "@/features/progress/progress.types";
 
@@ -65,14 +63,6 @@ export function ModuleCard({ module, progress }: ModuleCardProps) {
               Complete
             </span>
           ) : null}
-          <ConfirmDeleteButton
-            iconOnly
-            triggerLabel="Remove module"
-            heading="Delete Module?"
-            description={`This will permanently remove "${module.title}" and all of its lessons, progress, and notes.`}
-            confirmLabel="Delete Module"
-            action={deleteModuleAction.bind(null, courseId, module.id)}
-          />
         </div>
       </div>
 
