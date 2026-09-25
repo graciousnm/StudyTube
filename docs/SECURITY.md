@@ -1353,6 +1353,19 @@ Course import accepts a JSON file uploaded by the learner. It is a V1 feature wi
 
 ---
 
+# 74b. AI Integration Security
+
+AI assistance (course creation, module creation, and missing-module suggestions) is a V1 feature with the following security posture:
+
+- The provider key (`OPENROUTER_API_KEY`) is read server-side only and is never exposed to the browser; the browser only calls server actions.
+- All provider calls are HTTPS requests with a bounded timeout; provider failures are surfaced as plain user-facing errors and never corrupt local data.
+- Prompts are built only from curriculum metadata (titles, descriptions, goals, bounded lesson-title samples) — never from arbitrary user files or the raw database.
+- Every AI response is treated as untrusted input and run through Zod at the server boundary before it can be saved: outlines (titles, descriptions, topics), search queries, and video selections.
+- Video IDs selected by the AI are validated against the 11-character YouTube ID format before any lesson is created.
+- AI output is never persisted directly; it is first shown to the learner for review, who can edit or reject it before "Accept" writes ordinary course/module/lesson rows.
+
+---
+
 # 75. Final Security Principle
 
 > **StudyForge should expose as little as necessary, trust as little as necessary, validate every external input, and keep learner data and server credentials behind clear boundaries.**

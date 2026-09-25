@@ -1166,12 +1166,13 @@ Public profiles, bios, avatars, and account-linked identity are out of scope. Th
 
 ## AI
 
-- AI course generation
 - AI recommendations
 - AI tutoring
 - AI summaries
 - AI agents
 - AI-generated notes
+
+Assistive AI course and module creation is in V1 (see §52): the learner asks, AI proposes, the learner reviews and decides before anything is saved.
 
 ## Social
 
@@ -1233,7 +1234,6 @@ Future versions may consider:
 - Learning reminders
 - Better playback analytics
 - Course sharing
-- Optional AI curriculum suggestions
 - Optional user accounts
 - Multi-device synchronization
 
@@ -1243,11 +1243,11 @@ No future feature should be implemented merely because it is listed here.
 
 ---
 
-# 52. AI Future Principle
+# 52. AI Assistance Principle
 
-If AI is eventually introduced, the learner remains in control.
+AI operates as an assistive feature in V1. It is available when the learner opts in during the flow, driven by a server-side provider (OpenRouter) whose key is never exposed to the browser.
 
-The preferred model is:
+The model is always:
 
 ```text
 Learner
@@ -1263,7 +1263,13 @@ Accept / Reject / Modify
 Curriculum changes
 ```
 
-AI must not silently modify a learner's course.
+AI is available for:
+
+- **Course creation** — the learner gives a goal, experience and detail level; AI proposes a course outline (title, description, modules with planning topics).
+- **Module creation** — the learner gives the module focus within an existing course; AI proposes a single module outline.
+- **Missing-module suggestions** — the learner asks the AI to scan an existing course; AI proposes one important module it believes is missing, and the learner decides whether to accept it.
+
+AI must not silently modify a learner's course. AI output is treated as untrusted input: it is validated before it can be saved, and the learner reviews and edits every proposed course or module before it is created.
 
 ---
 

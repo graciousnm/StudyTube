@@ -1482,11 +1482,11 @@ This abstraction should only be introduced when a second source actually exists.
 
 # 67. AI Integration
 
-AI is explicitly outside V1.
+AI operates as an assistive feature in V1.
 
-If AI is introduced later, it should operate as an assistive feature.
+It runs server-side through a single provider abstraction (currently OpenRouter). The provider key stays on the server; the browser never sends or receives it. Prompts are built only from curriculum metadata with bounded sizes, and every AI response is validated through Zod at the server boundary before it can touch the database.
 
-Preferred conceptual flow:
+Conceptual flow:
 
 ```text
 Existing Curriculum
@@ -1529,7 +1529,7 @@ External API failures do not corrupt local data.
 
 No authentication exists in V1. The single-row local profile is not an account or a credential.
 
-No AI exists in V1.
+No AI mutation exists without explicit learner review. AI proposes; the learner reviews and approves; nothing is persisted otherwise.
 
 No distributed infrastructure exists in V1.
 ```

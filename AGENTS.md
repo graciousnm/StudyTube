@@ -19,7 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Non-negotiable constraints
 
-- **No AI** in V1. **No authentication/accounts** in V1 (no login, sessions, user tables, or `userId`/`owner` fields anywhere).
+- **No AI mutation without explicit learner review.** AI is assistive only: it proposes, the learner reviews and decides. **No authentication/accounts** in V1 (no login, sessions, user tables, or `userId`/`owner` fields anywhere).
 - **Not a generic SaaS**: no billing, subscriptions, orgs, teams, admin dashboards, analytics, user management. **No gamification** (XP, streaks, leaderboards, badges).
 - Learner-first, not an instructor LMS. Never invent features; if a requirement is ambiguous, flag it and choose the simplest behavior consistent with the docs.
 

@@ -1221,7 +1221,7 @@ prompts
 ai_runs
 ```
 
-in V1.
+in V1. AI features are stateless: they persist nothing beyond the ordinary `course`, `module`, and `lesson` rows the learner approves — never AI runs, prompts, or generated intermediates.
 
 ---
 
