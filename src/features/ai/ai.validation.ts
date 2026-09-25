@@ -44,6 +44,8 @@ export const courseOutlineSchema = z.object({
     .max(20, "Course must have 20 or fewer modules."),
 });
 
+export const moduleOutlineSchema = moduleSchema;
+
 export const generateOutlineInputSchema = z.object({
   goal: z
     .string()
@@ -58,9 +60,88 @@ export const generateOutlineInputSchema = z.object({
   detail: z.enum(["short", "standard", "detailed"]),
 });
 
+const existingModuleSummarySchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, "Module title is required.")
+    .max(200, "Module title must be 200 characters or fewer."),
+  description: z
+    .string()
+    .trim()
+    .max(5000, "Module description must be 5,000 characters or fewer.")
+    .default(""),
+  lessonTitles: z
+    .array(
+      z
+        .string()
+        .trim()
+        .max(200, "Lesson title must be 200 characters or fewer."),
+    )
+    .max(8, "Too many lesson titles."),
+});
+
+export const generateModuleInputSchema = z.object({
+  courseTitle: z
+    .string()
+    .trim()
+    .min(1, "Course title is required.")
+    .max(200, "Course title must be 200 characters or fewer."),
+  courseDescription: z
+    .string()
+    .trim()
+    .max(5000, "Course description must be 5,000 characters or fewer.")
+    .default(""),
+  courseGoal: z
+    .string()
+    .trim()
+    .max(500, "Course goal must be 500 characters or fewer.")
+    .optional(),
+  focus: z
+    .string()
+    .trim()
+    .min(1, "Module focus is required.")
+    .max(1000, "Module focus must be 1,000 characters or fewer."),
+  experience: z
+    .string()
+    .trim()
+    .max(1000, "Experience must be 1,000 characters or fewer.")
+    .optional(),
+  detail: z.enum(["short", "standard", "detailed"]),
+});
+
+export const suggestMissingModuleInputSchema = z.object({
+  courseTitle: z
+    .string()
+    .trim()
+    .min(1, "Course title is required.")
+    .max(200, "Course title must be 200 characters or fewer."),
+  courseDescription: z
+    .string()
+    .trim()
+    .max(5000, "Course description must be 5,000 characters or fewer.")
+    .default(""),
+  courseGoal: z
+    .string()
+    .trim()
+    .max(500, "Course goal must be 500 characters or fewer.")
+    .optional(),
+  existingModules: z
+    .array(existingModuleSummarySchema)
+    .min(1, "A course must have at least one module to scan.")
+    .max(24, "Too many modules to scan."),
+});
+
 export type CourseOutlineValidated = z.infer<typeof courseOutlineSchema>;
 export type GenerateOutlineInputValidated = z.infer<
   typeof generateOutlineInputSchema
+>;
+export type ModuleOutlineValidated = z.infer<typeof moduleOutlineSchema>;
+export type GenerateModuleInputValidated = z.infer<
+  typeof generateModuleInputSchema
+>;
+export type SuggestMissingModuleInputValidated = z.infer<
+  typeof suggestMissingModuleInputSchema
 >;
 
 const moduleTopicsSchema = z.object({

@@ -3,16 +3,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "@/components/ui/icons";
-import { createModuleAction } from "@/features/modules/module.actions";
-import { ModuleFormModal } from "./module-form-modal";
+import { AddModuleModal } from "@/features/ai/components/add-module-modal";
 
 interface AddModuleButtonProps {
   courseId: number;
+  courseTitle: string;
+  courseDescription: string;
+  courseGoal?: string;
+  aiAvailable?: boolean;
+  moduleCount: number;
   size?: "sm" | "md";
 }
 
 export function AddModuleButton({
   courseId,
+  courseTitle,
+  courseDescription,
+  courseGoal,
+  aiAvailable = false,
+  moduleCount,
   size = "md",
 }: AddModuleButtonProps) {
   const [open, setOpen] = useState(false);
@@ -23,12 +32,15 @@ export function AddModuleButton({
         <PlusIcon className="h-4 w-4" />
         Add Module
       </Button>
-      <ModuleFormModal
+      <AddModuleModal
         open={open}
         onClose={() => setOpen(false)}
-        action={createModuleAction.bind(null, courseId)}
-        title="Add Module"
-        submitLabel="Create Module"
+        courseId={courseId}
+        courseTitle={courseTitle}
+        courseDescription={courseDescription}
+        courseGoal={courseGoal}
+        aiAvailable={aiAvailable}
+        moduleCount={moduleCount}
       />
     </>
   );

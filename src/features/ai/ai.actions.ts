@@ -3,20 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db/client";
 import { createCourseWithModules } from "@/features/courses/course.mutations";
+import { getCourseById } from "@/features/courses/course.queries";
 import { courseIdSchema } from "@/features/courses/course.validation";
 import { addVideoToModuleAction } from "@/features/lessons/lesson.actions";
+import { listLessonsByModule } from "@/features/lessons/lesson.queries";
+import { createModule } from "@/features/modules/module.mutations";
+import { listModulesByCourse } from "@/features/modules/module.queries";
 import { searchYouTube } from "@/features/youtube/youtube.search";
 import {
+  generateModuleOutline,
   generateOutline,
   generateSearchQueries,
   selectBestVideos,
+  suggestMissingModule,
   AiProviderError,
 } from "./ai.provider";
 import type {
   CourseOutline,
   CurateVideosInput,
+  GenerateModuleInput,
   GenerateOutlineInput,
+  ModuleOutline,
   SearchQuery,
+  SuggestMissingModuleInput,
   TopicSearchResults,
   VideoSelection,
 } from "./ai.types";
@@ -24,8 +33,11 @@ import {
   courseOutlineSchema,
   curateVideosInputSchema,
   curatedVideosSchema,
+  generateModuleInputSchema,
   generateOutlineInputSchema,
+  moduleOutlineSchema,
   searchQueriesSchema,
+  suggestMissingModuleInputSchema,
   topicsWithResultsSchema,
 } from "./ai.validation";
 
@@ -76,6 +88,112 @@ export async function createCourseFromOutlineAction(
   } catch {
     return {
       error: "Failed to create the course. Please try again.",
+    };
+  }
+}
+
+export async function generateModuleOutlineAction(
+  input: GenerateModuleInput,
+): Promise<{ outline?: ModuleOutline; error?: string }> {
+  const parsed = generateModuleInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { error: "Please fill in the required fields." };
+  }
+
+  try {
+    const outline = await generateModuleOutline(parsed.data);
+    return { outline };
+  } catch (error) {
+    if (error instanceof AiProviderError) {
+      return { error: error.message };
+    }
+    return {
+      error:
+        "We couldn't generate a module right now. Please try again.",
+    };
+  }
+}
+
+export async function suggestMissingModuleAction(
+  courseId: number,
+): Promise<{ outline?: ModuleOutline; error?: string }> {
+  const parsedId = courseIdSchema.safeParse(courseId);
+  if (!parsedId.success) {
+    return { error: "This course no longer exists." };
+  }
+
+  const course = getCourseById(getDb(), parsedId.data);
+  if (!course) {
+    return { error: "This course no longer exists." };
+  }
+
+  const db = getDb();
+  const existingModules = listModulesByCourse(db, course.id);
+  if (existingModules.length === 0) {
+    return { error: "Add at least one module before asking for a suggestion." };
+  }
+
+  const input: SuggestMissingModuleInput = {
+    courseTitle: course.title,
+    courseDescription: course.description ?? "",
+    courseGoal: course.goal ?? undefined,
+    existingModules: existingModules.slice(0, 24).map((mod) => ({
+      title: mod.title,
+      description: mod.description ?? "",
+      lessonTitles: listLessonsByModule(db, mod.id)
+        .slice(0, 8)
+        .flatMap((lesson) => (lesson.youtube_title ? [lesson.youtube_title] : [])),
+    })),
+  };
+
+  const parsed = suggestMissingModuleInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      error: "We couldn't scan this course right now. Please try again.",
+    };
+  }
+
+  try {
+    const outline = await suggestMissingModule(parsed.data);
+    return { outline };
+  } catch (error) {
+    if (error instanceof AiProviderError) {
+      return { error: error.message };
+    }
+    return {
+      error:
+        "We couldn't scan this course right now. Please try again.",
+    };
+  }
+}
+
+export async function createModuleFromOutlineAction(
+  courseId: number,
+  outline: ModuleOutline,
+): Promise<{ moduleId?: number; title?: string; topics?: string[]; error?: string }> {
+  const parsedId = courseIdSchema.safeParse(courseId);
+  const parsedOutline = moduleOutlineSchema.safeParse(outline);
+  if (!parsedId.success) {
+    return { error: "This course no longer exists." };
+  }
+  if (!parsedOutline.success) {
+    return { error: "Invalid module outline. Please try again." };
+  }
+
+  try {
+    const created = createModule(getDb(), parsedId.data, {
+      title: parsedOutline.data.title,
+      description: parsedOutline.data.description,
+    });
+    revalidatePath(`/courses/${parsedId.data}`);
+    return {
+      moduleId: created.id,
+      title: created.title,
+      topics: parsedOutline.data.topics,
+    };
+  } catch {
+    return {
+      error: "Failed to create the module. Please try again.",
     };
   }
 }

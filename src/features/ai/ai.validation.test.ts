@@ -3,8 +3,11 @@ import {
   courseOutlineSchema,
   curateVideosInputSchema,
   curatedVideosSchema,
+  generateModuleInputSchema,
   generateOutlineInputSchema,
+  moduleOutlineSchema,
   searchQueriesSchema,
+  suggestMissingModuleInputSchema,
   topicsWithResultsSchema,
 } from "./ai.validation";
 
@@ -316,6 +319,188 @@ describe("curatedVideosSchema", () => {
       curatedVideosSchema.safeParse([
         { moduleId: 1, videoId: "not-a-video-id" },
       ]).success,
+    ).toBe(false);
+  });
+});
+
+describe("moduleOutlineSchema", () => {
+  const validOutline = {
+    title: "Chord Progressions",
+    description: "Common progressions in worship.",
+    topics: ["I-IV-V", "Minor keys"],
+  };
+
+  it("accepts a valid module outline", () => {
+    expect(moduleOutlineSchema.safeParse(validOutline).success).toBe(true);
+  });
+
+  it("accepts an outline without description", () => {
+    const { description: _description, ...rest } = validOutline;
+    void _description;
+    expect(moduleOutlineSchema.safeParse(rest).success).toBe(true);
+  });
+
+  it("defaults description to an empty string", () => {
+    const { description: _description, ...rest } = validOutline;
+    void _description;
+    const result = moduleOutlineSchema.safeParse(rest);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.description).toBe("");
+    }
+  });
+
+  it("rejects a missing title", () => {
+    const { title: _title, ...rest } = validOutline;
+    void _title;
+    expect(moduleOutlineSchema.safeParse(rest).success).toBe(false);
+  });
+
+  it("rejects an empty title", () => {
+    expect(
+      moduleOutlineSchema.safeParse({ ...validOutline, title: "  " }).success,
+    ).toBe(false);
+  });
+
+  it("rejects no topics", () => {
+    expect(
+      moduleOutlineSchema.safeParse({ ...validOutline, topics: [] }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an empty topic string", () => {
+    expect(
+      moduleOutlineSchema.safeParse({
+        ...validOutline,
+        topics: ["  "],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("trims whitespace from fields", () => {
+    const result = moduleOutlineSchema.safeParse({
+      title: "  Title  ",
+      description: "  Desc  ",
+      topics: ["  Topic  "],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.title).toBe("Title");
+      expect(result.data.description).toBe("Desc");
+      expect(result.data.topics).toEqual(["Topic"]);
+    }
+  });
+});
+
+describe("generateModuleInputSchema", () => {
+  const validInput = {
+    courseTitle: "Worship Piano",
+    courseDescription: "Learn worship piano.",
+    focus: "Chord progressions",
+    detail: "standard",
+  };
+
+  it("accepts a valid input", () => {
+    expect(generateModuleInputSchema.safeParse(validInput).success).toBe(true);
+  });
+
+  it("accepts optional experience and course goal", () => {
+    const result = generateModuleInputSchema.safeParse({
+      ...validInput,
+      courseGoal: "Play for Sunday service",
+      experience: "Beginner",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a missing focus", () => {
+    const { focus: _focus, ...rest } = validInput;
+    void _focus;
+    expect(generateModuleInputSchema.safeParse(rest).success).toBe(false);
+  });
+
+  it("rejects an invalid detail level", () => {
+    expect(
+      generateModuleInputSchema.safeParse({
+        ...validInput,
+        detail: "extra",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an over-long course title", () => {
+    expect(
+      generateModuleInputSchema.safeParse({
+        ...validInput,
+        courseTitle: "x".repeat(201),
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("suggestMissingModuleInputSchema", () => {
+  const validInput = {
+    courseTitle: "Worship Piano",
+    courseDescription: "Learn worship piano.",
+    existingModules: [
+      {
+        title: "Basics",
+        description: "Getting started.",
+        lessonTitles: ["Posture", "Scales"],
+      },
+    ],
+  };
+
+  it("accepts a valid input", () => {
+    expect(
+      suggestMissingModuleInputSchema.safeParse(validInput).success,
+    ).toBe(true);
+  });
+
+  it("rejects an empty existingModules list", () => {
+    expect(
+      suggestMissingModuleInputSchema.safeParse({
+        ...validInput,
+        existingModules: [],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects more than 24 modules to scan", () => {
+    const existingModules = Array.from({ length: 25 }, (_, i) => ({
+      title: `Module ${i}`,
+      description: "",
+      lessonTitles: ["Topic"],
+    }));
+    expect(
+      suggestMissingModuleInputSchema.safeParse({
+        ...validInput,
+        existingModules,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects too many lesson titles per module", () => {
+    expect(
+      suggestMissingModuleInputSchema.safeParse({
+        ...validInput,
+        existingModules: [
+          {
+            title: "Basics",
+            description: "",
+            lessonTitles: Array.from({ length: 9 }, (_, i) => `Lesson ${i}`),
+          },
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an over-long course goal", () => {
+    expect(
+      suggestMissingModuleInputSchema.safeParse({
+        ...validInput,
+        courseGoal: "x".repeat(501),
+      }).success,
     ).toBe(false);
   });
 });

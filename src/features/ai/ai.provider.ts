@@ -2,12 +2,18 @@ import type {
   AiProviderConfig,
   CourseOutline,
   CurateVideosInput,
+  GenerateModuleInput,
   GenerateOutlineInput,
+  ModuleOutline,
   SearchQuery,
+  SuggestMissingModuleInput,
   TopicSearchResults,
   VideoSelection,
 } from "./ai.types";
-import { courseOutlineSchema } from "./ai.validation";
+import {
+  courseOutlineSchema,
+  moduleOutlineSchema,
+} from "./ai.validation";
 
 const DEFAULT_MODEL = "meta-llama/llama-3.3-70b-instruct";
 const DEFAULT_BASE_URL = "https://openrouter.ai/api/v1";
@@ -193,6 +199,138 @@ export async function generateOutline(
   const result = courseOutlineSchema.safeParse(parsed);
   if (!result.success) {
     console.error("[ai] Outline schema validation failed:", result.error.format());
+    throw new AiProviderError(
+      "We couldn't generate your learning path right now. Please try again.",
+    );
+  }
+
+  return result.data;
+}
+
+function buildModuleSystemPrompt(): string {
+  return `You are a course module outline generator. Given an existing course and a module focus, you create one structured module outline.
+
+Return ONLY a JSON object matching this exact schema:
+{
+  "title": "Module title",
+  "description": "Brief module description",
+  "topics": ["Topic 1", "Topic 2"]
+}
+
+Rules:
+- Title the module based on the module focus and the course context.
+- Modules should have 2-4 topics for short, 3-8 for standard, 5-10 for detailed.
+- Topics are planning suggestions, not lessons.
+- Do NOT include YouTube video IDs or URLs.
+- Do NOT create lesson entries.
+- Return ONLY the JSON object, no other text.`;
+}
+
+function buildModuleUserPrompt(input: GenerateModuleInput): string {
+  let prompt = `Course: ${input.courseTitle}`;
+  if (input.courseDescription) {
+    prompt += `\nCourse description: ${input.courseDescription}`;
+  }
+  if (input.courseGoal) {
+    prompt += `\nCourse goal: ${input.courseGoal}`;
+  }
+  prompt += `\nModule focus: ${input.focus}`;
+  if (input.experience) {
+    prompt += `\nCurrent experience: ${input.experience}`;
+  }
+  prompt += `\nDetail level: ${input.detail}`;
+  return prompt;
+}
+
+export async function generateModuleOutline(
+  input: GenerateModuleInput,
+): Promise<ModuleOutline> {
+  const config = getConfig();
+  const content = await callOpenRouter(
+    config,
+    buildModuleSystemPrompt(),
+    buildModuleUserPrompt(input),
+  );
+
+  const parsed = parseJsonResponse<unknown>(content, "module outline");
+
+  const result = moduleOutlineSchema.safeParse(parsed);
+  if (!result.success) {
+    console.error(
+      "[ai] Module outline schema validation failed:",
+      result.error.format(),
+    );
+    throw new AiProviderError(
+      "We couldn't generate your learning path right now. Please try again.",
+    );
+  }
+
+  return result.data;
+}
+
+function buildSuggestSystemPrompt(): string {
+  return `You are a course gap analyst for an educational platform. Given a course with its existing modules, you propose exactly one important module that the course is missing.
+
+Return ONLY a JSON object matching this exact schema:
+{
+  "title": "Proposed module title",
+  "description": "Why this module matters, what gap it fills",
+  "topics": ["Topic 1", "Topic 2"]
+}
+
+Rules:
+- Propose EXACTLY one module that meaningfully advances the learner toward the course goal.
+- It must fill a genuine gap: do not duplicate or overlap the existing modules.
+- Prefer gaps in prerequisites, foundations, common blind spots, or practice/synthesis.
+- Have 3-8 topics.
+- Topics are planning suggestions, not lessons.
+- Do NOT include YouTube video IDs or URLs.
+- Do NOT create lesson entries.
+- Return ONLY the JSON object, no other text.`;
+}
+
+function buildSuggestUserPrompt(input: SuggestMissingModuleInput): string {
+  let prompt = `Course: ${input.courseTitle}`;
+  if (input.courseDescription) {
+    prompt += `\nCourse description: ${input.courseDescription}`;
+  }
+  if (input.courseGoal) {
+    prompt += `\nCourse goal: ${input.courseGoal}`;
+  }
+  prompt += "\n\nExisting modules and what they cover:";
+  for (let i = 0; i < input.existingModules.length; i++) {
+    const mod = input.existingModules[i];
+    prompt += `\nModule ${i + 1}: ${mod.title}`;
+    if (mod.description) {
+      prompt += ` — ${mod.description}`;
+    }
+    if (mod.lessonTitles.length > 0) {
+      prompt += `\n  Lessons: ${mod.lessonTitles.join(" | ")}`;
+    }
+  }
+  prompt +=
+    "\n\nPropose exactly one missing module that fills a real gap in this course.";
+  return prompt;
+}
+
+export async function suggestMissingModule(
+  input: SuggestMissingModuleInput,
+): Promise<ModuleOutline> {
+  const config = getConfig();
+  const content = await callOpenRouter(
+    config,
+    buildSuggestSystemPrompt(),
+    buildSuggestUserPrompt(input),
+  );
+
+  const parsed = parseJsonResponse<unknown>(content, "missing module suggestion");
+
+  const result = moduleOutlineSchema.safeParse(parsed);
+  if (!result.success) {
+    console.error(
+      "[ai] Missing module schema validation failed:",
+      result.error.format(),
+    );
     throw new AiProviderError(
       "We couldn't generate your learning path right now. Please try again.",
     );

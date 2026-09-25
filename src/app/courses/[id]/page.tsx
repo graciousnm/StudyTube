@@ -72,7 +72,15 @@ export default async function CoursePage({ params }: CoursePageProps) {
             />
           </div>
           <div className="shrink-0">
-            <AddModuleButton courseId={course.id} size="sm" />
+            <AddModuleButton
+              courseId={course.id}
+              courseTitle={course.title}
+              courseDescription={course.description ?? ""}
+              courseGoal={course.goal ?? undefined}
+              aiAvailable={process.env.OPENROUTER_API_KEY !== undefined}
+              moduleCount={modules.length}
+              size="sm"
+            />
           </div>
         </div>
 

@@ -16,6 +16,34 @@ export interface GenerateOutlineInput {
   detail: "short" | "standard" | "detailed";
 }
 
+export interface ModuleOutline {
+  title: string;
+  description: string;
+  topics: string[];
+}
+
+export interface GenerateModuleInput {
+  courseTitle: string;
+  courseDescription: string;
+  courseGoal?: string;
+  focus: string;
+  experience?: string;
+  detail: "short" | "standard" | "detailed";
+}
+
+export interface ExistingModuleSummary {
+  title: string;
+  description: string;
+  lessonTitles: string[];
+}
+
+export interface SuggestMissingModuleInput {
+  courseTitle: string;
+  courseDescription: string;
+  courseGoal?: string;
+  existingModules: ExistingModuleSummary[];
+}
+
 export interface AiProviderConfig {
   apiKey: string;
   model: string;
