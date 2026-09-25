@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { courses, lessons, modules, type Course } from "@/db/schema";
 
@@ -8,6 +8,14 @@ export function listCourses(db: Db): Course[] {
 
 export function getCourseById(db: Db, id: number): Course | undefined {
   return db.select().from(courses).where(eq(courses.id, id)).get();
+}
+
+export function getCourseByTitle(db: Db, title: string): Course | undefined {
+  return db
+    .select()
+    .from(courses)
+    .where(sql`lower(${courses.title}) = ${title.trim().toLowerCase()}`)
+    .get();
 }
 
 export function getFirstLessonThumbnails(db: Db): Map<number, string | null> {

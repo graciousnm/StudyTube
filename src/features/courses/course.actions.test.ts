@@ -14,6 +14,8 @@ import {
 } from "vitest";
 import { closeDb, createDb, getDb, type Db } from "@/db/client";
 import { courses, lessons, modules } from "@/db/schema";
+import { createCourse } from "./course.mutations";
+import { createModule } from "@/features/modules/module.mutations";
 import { listCourses } from "./course.queries";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -381,5 +383,153 @@ describe("importCourseAction", () => {
     const handle = openDb();
     expect(listCourses(handle.db)).toHaveLength(0);
     handle.close();
+  });
+
+  it("rejects an import whose title and ordered module names already exist", async () => {
+    const handle = openDb();
+    const course = createCourse(handle.db, {
+      title: "Worship Piano",
+      description: "",
+    });
+    createModule(handle.db, course.id, {
+      title: "Chords",
+      description: "",
+    });
+    createModule(handle.db, course.id, {
+      title: "Scales",
+      description: "",
+    });
+    handle.close();
+
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "  worship piano  ",
+        description: "",
+        goal: "Play confidently",
+        modules: [
+          { title: "chords", description: "", lessons: [] },
+          { title: "scales", description: "", lessons: [] },
+        ],
+      },
+    });
+
+    const state = await actions.importCourseAction({}, fileInput(json));
+
+    expect(state.error).toBe(`A course named "Worship Piano" with the same modules already exists.`);
+    const after = openDb();
+    expect(listCourses(after.db)).toHaveLength(1);
+    expect(after.db.select().from(modules).all()).toHaveLength(2);
+    after.close();
+  });
+
+  it("imports when a same-title course has different module names", async () => {
+    const handle = openDb();
+    const course = createCourse(handle.db, {
+      title: "Worship Piano",
+      description: "",
+    });
+    createModule(handle.db, course.id, { title: "Chords", description: "" });
+    handle.close();
+
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "Worship Piano",
+        description: "",
+        modules: [
+          { title: "Different Module", description: "", lessons: [] },
+        ],
+      },
+    });
+
+    await expectRedirect(actions.importCourseAction({}, fileInput(json)), /^REDIRECT:\/courses\/\d+/);
+
+    const after = openDb();
+    expect(listCourses(after.db)).toHaveLength(2);
+    after.close();
+  });
+
+  it("imports when a same-title course has the same modules in a different order", async () => {
+    const handle = openDb();
+    const course = createCourse(handle.db, {
+      title: "Worship Piano",
+      description: "",
+    });
+    createModule(handle.db, course.id, { title: "Chords", description: "" });
+    createModule(handle.db, course.id, { title: "Scales", description: "" });
+    handle.close();
+
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "Worship Piano",
+        description: "",
+        modules: [
+          { title: "Scales", description: "", lessons: [] },
+          { title: "Chords", description: "", lessons: [] },
+        ],
+      },
+    });
+
+    await expectRedirect(actions.importCourseAction({}, fileInput(json)), /^REDIRECT:\/courses\/\d+/);
+
+    const after = openDb();
+    expect(listCourses(after.db)).toHaveLength(2);
+    after.close();
+  });
+
+  it("imports when a same-title course has a different module count", async () => {
+    const handle = openDb();
+    const course = createCourse(handle.db, {
+      title: "Worship Piano",
+      description: "",
+    });
+    createModule(handle.db, course.id, { title: "Chords", description: "" });
+    handle.close();
+
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: {
+        title: "Worship Piano",
+        description: "",
+        modules: [
+          { title: "Chords", description: "", lessons: [] },
+          { title: "Scales", description: "", lessons: [] },
+        ],
+      },
+    });
+
+    await expectRedirect(actions.importCourseAction({}, fileInput(json)), /^REDIRECT:\/courses\/\d+/);
+
+    const after = openDb();
+    expect(listCourses(after.db)).toHaveLength(2);
+    after.close();
+  });
+
+  it("imports a same-title empty course into a course with modules", async () => {
+    const handle = openDb();
+    const course = createCourse(handle.db, {
+      title: "Worship Piano",
+      description: "",
+    });
+    createModule(handle.db, course.id, { title: "Chords", description: "" });
+    handle.close();
+
+    const json = JSON.stringify({
+      format: "studyforge-course",
+      version: 1,
+      course: { title: "Worship Piano", description: "", modules: [] },
+    });
+
+    await expectRedirect(actions.importCourseAction({}, fileInput(json)), /^REDIRECT:\/courses\/\d+/);
+
+    const after = openDb();
+    expect(listCourses(after.db)).toHaveLength(2);
+    after.close();
   });
 });

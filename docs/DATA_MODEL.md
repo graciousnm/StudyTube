@@ -1428,7 +1428,7 @@ The SQLite database should remain a self-contained representation of the learner
 
 ## Course import/export
 
-Courses can be exported as portable JSON (`studyforge-course` format, version 1) and imported back. Exports and imports cover the curriculum only: course title, description, learning goal, modules, lessons, and their YouTube metadata. Notes and progress are never part of the export — they remain inside the single-user database. Imports always create a new course and never overwrite existing rows.
+Courses can be exported as portable JSON (`studyforge-course` format, version 1) and imported back. Exports and imports cover the curriculum only: course title, description, learning goal, modules, lessons, and their YouTube metadata. Notes and progress are never part of the export — they remain inside the single-user database. Imports always create a new course and never overwrite existing rows; an import is refused when a course with the same title and the same ordered module names already exists, so the library never gains silent duplicates.
 
 ---
 

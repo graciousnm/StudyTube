@@ -18,7 +18,7 @@ import {
   deleteCourse,
   updateCourse,
 } from "./course.mutations";
-import { getCourseById } from "./course.queries";
+import { getCourseById, getCourseByTitle } from "./course.queries";
 import type { CourseActionState } from "./course.types";
 
 export async function createCourseAction(
@@ -141,6 +141,23 @@ export interface ImportCourseState {
   error?: string;
 }
 
+function normalizeName(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function hasSameOrderedModules(
+  existingModuleTitles: string[],
+  importedModules: { title: string }[],
+): boolean {
+  return (
+    existingModuleTitles.length === importedModules.length &&
+    existingModuleTitles.every(
+      (title, index) =>
+        title === normalizeName(importedModules[index].title),
+    )
+  );
+}
+
 export async function importCourseAction(
   _prevState: ImportCourseState,
   formData: FormData,
@@ -172,8 +189,26 @@ export async function importCourseAction(
     return { error: "The file is not a valid StudyForge course export." };
   }
 
+  const db = getDb();
+  const existing = getCourseByTitle(db, validated.data.course.title);
+  if (existing) {
+    const existingModuleTitles = listModulesByCourse(db, existing.id).map(
+      (mod) => normalizeName(mod.title),
+    );
+    if (
+      hasSameOrderedModules(
+        existingModuleTitles,
+        validated.data.course.modules,
+      )
+    ) {
+      return {
+        error: `A course named "${existing.title}" with the same modules already exists.`,
+      };
+    }
+  }
+
   const { course, skippedDuplicates } = createCourseWithModulesAndLessons(
-    getDb(),
+    db,
     validated.data.course,
   );
 

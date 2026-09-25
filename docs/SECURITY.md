@@ -1349,7 +1349,7 @@ Course import accepts a JSON file uploaded by the learner. It is a V1 feature wi
   - Text fields are trimmed and length-capped (titles, descriptions, goals, module names).
   - Counts are capped (50 modules, 200 lessons per module) and total file size is capped at 5 MB.
 - Imported content stores YouTube metadata and IDs only — never URLs to arbitrary hosts beyond the validated thumbnails, and never video content.
-- Import always creates a new course; it cannot overwrite or merge into existing data.
+- Import always creates a new course; it cannot overwrite or merge into existing data. A server-side check rejects any import whose title and ordered module names match an existing course (case-insensitive) before any write.
 
 ---
 

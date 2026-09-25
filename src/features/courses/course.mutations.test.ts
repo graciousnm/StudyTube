@@ -10,7 +10,7 @@ import {
   deleteCourse,
   updateCourse,
 } from "./course.mutations";
-import { getCourseById, listCourses } from "./course.queries";
+import { getCourseById, getCourseByTitle, listCourses } from "./course.queries";
 
 let db: Db;
 let close: () => void;
@@ -58,6 +58,24 @@ describe("course queries and mutations", () => {
       "First",
       "Second",
     ]);
+  });
+
+  it("finds a course by exact title", () => {
+    const created = createCourse(db, { title: "Real Estate", description: "" });
+    expect(getCourseByTitle(db, "Real Estate")?.id).toBe(created.id);
+  });
+
+  it("matches course titles case-insensitively and trims input", () => {
+    const created = createCourse(db, { title: "Worship Piano", description: "" });
+
+    expect(getCourseByTitle(db, "worship piano")?.id).toBe(created.id);
+    expect(getCourseByTitle(db, "  WORSHIP PIANO  ")?.id).toBe(created.id);
+  });
+
+  it("returns undefined when no course has the title", () => {
+    createCourse(db, { title: "Real Estate", description: "" });
+    expect(getCourseByTitle(db, "Real Estate Course")).toBeUndefined();
+    expect(getCourseByTitle(db, " ")).toBeUndefined();
   });
 
   it("updates an existing course", () => {

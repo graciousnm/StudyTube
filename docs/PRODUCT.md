@@ -248,7 +248,8 @@ Export:
 Import:
 
 - Available from the "New Course" flow as an "Import a Course" option, next to manual and AI creation.
-- Always creates a new course; it never merges into an existing course.
+- Always creates a new course; it never merges into an existing course. An import is refused when a course with the same title and the same module names in the same order already exists (compared case-insensitively after trimming), so the library never gains silent duplicates; the error names the existing course.
+- Different module names, module order, or module count let the same title import — order matters because curriculum order is significant in StudyForge.
 - Accepts only files in the StudyForge export format; anything else is rejected at the server boundary.
 - Recognizes the export format marker (`format: "studyforge-course"`), caps each import at 50 modules and 200 lessons per module, and rejects files larger than 5 MB.
 - Duplicate video IDs within a single module are skipped during import so the same video cannot be added twice to one module. Reuse of a video across modules (or across the library) remains allowed.

@@ -344,7 +344,7 @@ Avoid filling the page with unrelated statistics.
 
 The course header leads with the title. Course actions (Edit / Export / Delete) sit in a three-dot menu to the right of the title; the "Add module" button is on the opposite side. The header ends with the description, an optional Goal call-out, and the Completed indicator.
 
-Modules render as a card grid — two columns on tablet and three on large screens. Each card leads with a position pill and a `text-lg` title, with the description beneath; a progress row places the lesson count inline with a thin accent bar. A muted ghost delete sits in the card's top-right (reddening on hover), and move arrows live in a small-screens-only footer (see §17). A completed module may show a small Complete chip.
+Modules render as a card grid — two columns on tablet and three on large screens. Each card leads with a position pill and a `text-lg` title, with the description beneath; a progress row places the lesson count inline with a thin accent bar. Module cards are browse-only — module management (edit/delete) lives on the module page's three-dot menu (see §12) so the grid stays focused. Reordering is drag-and-drop via the card's grip handle. A completed module may show a small Complete chip.
 
 ---
 
@@ -365,7 +365,7 @@ Course create and edit open in a modal dialog (from the header/home and the cour
 Import and export live inside these same flows rather than on their own pages:
 
 - The course actions menu (top-right of the course header) offers Edit / Export / Delete. Export triggers a direct `.studyforge-course.json` download of that course's curriculum (title, description, learning goal, modules, lessons).
-- The "New Course" flow's choice modal shows three options: Create Manually, Import a Course, and (when available) Create with AI. Import opens a modal with a file picker and a short explanation; the file is sent to the server, which validates it and redirects to the newly created course on success, or shows an error in place.
+- The "New Course" flow's choice modal shows three options: Create Manually, Import a Course, and (when available) Create with AI. Import opens a modal with a file picker and a short explanation; the file is sent to the server, which validates it and redirects to the newly created course on success, or shows an error in place. An import is refused when a course with the same title and the same ordered module names already exists, and the modal explains the duplicate so the learner can rename or delete the existing course instead.
 
 Example:
 
@@ -414,7 +414,7 @@ Lessons                [ Add YouTube Video ]
 05  ...
 ```
 
-The module header is a card. A pill badge (matching the module position pills) labels the module number above the title, and module edit/delete appear as two matching ghost icon buttons in the top-right, vertically centered against the title. The header closes with a Progress section identical to the course banner's: a kicker row (`Progress` / `N / M lessons complete`) above a thin, full-width accent bar, a primary Start Learn/Continue Learning button leading to the module's current or next incomplete lesson, and a Completed chip when the module is fully complete. The Add YouTube Video control lives in the Lessons section header, mirroring Add Module on the course page.
+The module header is a card. A pill badge (matching the module position pills) labels the module number above the title, and module management (Edit / Delete) sits in a three-dot menu to the right of the title. When set, the module's description renders beneath the title row. The header closes with a Progress section identical to the course banner's: a kicker row (`Progress` / `N / M lessons complete`) above a thin, full-width accent bar, a primary Start Learn/Continue Learning button leading to the module's current or next incomplete lesson, and a Completed chip when the module is fully complete. The Edit action opens a modal with the module's title and description prefilled. The Add YouTube Video control lives in the Lessons section header, mirroring Add Module on the course page.
 
 Lessons should have a clear order.
 
