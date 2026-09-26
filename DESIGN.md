@@ -229,7 +229,7 @@ On smaller screens, navigation should collapse into a mobile-friendly pattern.
 
 Inner pages (course, module, add-video, lesson) show a breadcrumb trail — `Courses / Course / Module / …` — instead of a single Back link. The trail's current page is the last, non-linked item.
 
-The global New Course control in the app header uses the neutral outline (see §4) so the solid accent stays reserved for in-page primary actions; the Courses page's own New Course controls remain solid primary.
+The global New Course control in the app header uses the neutral outline (see §4) so the solid accent stays reserved for in-page primary actions.
 
 When the installation has a local profile (see DATA_MODEL.md §44), the header also shows the learner's name with an avatar icon as a link to the Profile page. This is a local, single-installation designation — not an account — and it never dominates or clutters the navigation. Before a profile exists, the header shows no name and the home page prompts the name step instead (see §50).
 
@@ -278,7 +278,7 @@ When there is no course to continue, the home screen shows no Continue Learning 
 The Courses page (`/courses`) is the library the learner browses ("My Courses"). It lists every course in the app, each with its completion progress, in curriculum order:
 
 ```text
-Courses                          [ + New Course ]
+Courses
 
 ────────────────────────────
 Course card · Course card · Course card
@@ -294,9 +294,9 @@ Course list (with progress)
 
 The most important action is creating the first course:
 
-When there are no courses, the page shows an empty state — a dashed card with "No courses yet" and a solid primary `Create Course` button.
+When there are no courses, the page shows an empty state — a dashed card with "No courses yet".
 
-The header's global New Course control and the in-page Create Course button are the entry points; see §8.
+The header's global New Course control is the entry point; see §8.
 
 ---
 

@@ -216,7 +216,7 @@ Course creation should be a simple operation.
 
 No multi-step course wizard is required.
 
-Creating and editing a course happens in a modal dialog on the page the learner is already on (header, courses page, or course page), not on a separate route. Module create/edit works the same way from the course and module pages. The header's global New Course control and the Courses page's in-page controls both open the same create flow.
+Creating and editing a course happens in a modal dialog on the page the learner is already on (header or course page), not on a separate route. Module create/edit works the same way from the course and module pages. The header's global New Course control opens the same create flow.
 
 ---
 
@@ -789,13 +789,13 @@ The home page shows a "Recently studied" section below Continue Learning. It lis
 
 # 33a. Courses Page
 
-A dedicated Courses page (`/courses`) is the library for the learner's courses. It lists every course with its completion progress, in curriculum order, and provides the primary create entry point:
+A dedicated Courses page (`/courses`) is the library for the learner's courses. It lists every course in the app, in curriculum order, with each course's completion progress:
 
-- A page header with the "Courses" title and the New Course control.
-- An empty state ("No courses yet") with a solid primary `Create Course` button when no course exists.
+- A page header with the "Courses" title.
+- An empty state ("No courses yet") when no course exists.
 - Course cards with progress, matching the grid used elsewhere in the app.
 
-The global New Course control in the app header and the in-page course controls open the same create flow (manual, import, or AI).
+The global New Course control in the app header opens the create flow (manual, import, or AI); it is the single create entry point.
 
 ---
 
