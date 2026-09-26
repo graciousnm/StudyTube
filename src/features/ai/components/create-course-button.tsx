@@ -125,7 +125,7 @@ export function CreateCourseButton({
                 <div>
                   <p className="font-medium text-zinc-100">Import a Course</p>
                   <p className="text-sm text-zinc-500">
-                    Load a StudyForge course export
+                    Load a StudyTube course export
                   </p>
                 </div>
               </button>

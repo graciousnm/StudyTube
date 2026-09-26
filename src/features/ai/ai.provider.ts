@@ -56,7 +56,7 @@ async function callOpenRouter(
         headers: {
           Authorization: `Bearer ${config.apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://studyforge.app",
+          "HTTP-Referer": "https://studytube.app",
           "X-OpenRouter-Title": "StudyTube",
         },
         body: JSON.stringify({

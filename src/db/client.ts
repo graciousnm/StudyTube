@@ -30,19 +30,19 @@ export function createDb(databaseUrl: string): DatabaseHandle {
 }
 
 const globalForDb = globalThis as unknown as {
-  __studyforgeDb?: DatabaseHandle;
+  __studytubeDb?: DatabaseHandle;
 };
 
 export function getDb(): Db {
-  if (!globalForDb.__studyforgeDb) {
-    globalForDb.__studyforgeDb = createDb(
+  if (!globalForDb.__studytubeDb) {
+    globalForDb.__studytubeDb = createDb(
       process.env.DATABASE_URL ?? DEFAULT_DATABASE_URL,
     );
   }
-  return globalForDb.__studyforgeDb.db;
+  return globalForDb.__studytubeDb.db;
 }
 
 export function closeDb(): void {
-  globalForDb.__studyforgeDb?.close();
-  globalForDb.__studyforgeDb = undefined;
+  globalForDb.__studytubeDb?.close();
+  globalForDb.__studytubeDb = undefined;
 }

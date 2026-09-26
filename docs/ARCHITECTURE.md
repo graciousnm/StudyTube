@@ -1,10 +1,10 @@
-# StudyForge — Application Architecture
+# StudyTube — Application Architecture
 
 ## 1. Purpose
 
-This document defines the technical architecture of StudyForge.
+This document defines the technical architecture of StudyTube.
 
-StudyForge is a self-hosted, learner-focused web application for turning scattered YouTube educational content into structured learning paths.
+StudyTube is a self-hosted, learner-focused web application for turning scattered YouTube educational content into structured learning paths.
 
 The architecture is intentionally designed for:
 
@@ -24,7 +24,7 @@ The architecture should remain simple until actual product requirements require 
 
 # 2. Architectural Principles
 
-StudyForge follows these principles:
+StudyTube follows these principles:
 
 1. Correctness over cleverness.
 2. Simplicity over unnecessary abstraction.
@@ -89,7 +89,7 @@ No individual technology should be added merely because it is popular.
 
 # 4. High-Level Architecture
 
-StudyForge follows a single-application architecture:
+StudyTube follows a single-application architecture:
 
 ```text
                     Browser
@@ -180,7 +180,7 @@ The exact directory names may evolve as implementation proceeds, but feature own
 
 # 7. Next.js App Router
 
-StudyForge uses the Next.js App Router.
+StudyTube uses the Next.js App Router.
 
 The `app/` directory is responsible primarily for:
 
@@ -626,7 +626,7 @@ Learner
  ↓
 Search UI
  ↓
-StudyForge server
+StudyTube server
  ↓
 YouTube feature
  ↓
@@ -639,7 +639,7 @@ Search UI
 
 The raw YouTube API response should not be passed directly throughout the application.
 
-Normalize the fields StudyForge actually needs.
+Normalize the fields StudyTube actually needs.
 
 ---
 
@@ -663,7 +663,7 @@ Return updated module
 
 The video is not downloaded.
 
-StudyForge stores metadata and the external video identifier.
+StudyTube stores metadata and the external video identifier.
 
 ---
 
@@ -889,7 +889,7 @@ However:
 
 # 38. State Management
 
-StudyForge does not require a global client state manager in V1.
+StudyTube does not require a global client state manager in V1.
 
 Do not introduce Redux.
 
@@ -948,7 +948,7 @@ Example:
 src/features/youtube/components/
 ```
 
-A generic UI component should not contain StudyForge-specific business logic.
+A generic UI component should not contain StudyTube-specific business logic.
 
 ---
 
@@ -962,7 +962,7 @@ Reusable presentation components.
 
 ### Feature components
 
-Components implementing a specific StudyForge capability.
+Components implementing a specific StudyTube capability.
 
 ### Page components
 
@@ -1054,7 +1054,7 @@ Conceptually:
 
 ```text
 ┌──────────────────────────┐
-│      StudyForge          │
+│      StudyTube          │
 │                          │
 │ Next.js                  │
 │ Node.js                  │
@@ -1089,7 +1089,7 @@ Backups are operational infrastructure, not application-domain logic.
 Conceptually:
 
 ```text
-StudyForge
+StudyTube
     │
     ▼
 SQLite
@@ -1112,7 +1112,7 @@ YouTube may be unavailable.
 The application should distinguish between:
 
 ```text
-StudyForge database unavailable
+StudyTube database unavailable
 ```
 
 and:
@@ -1401,7 +1401,7 @@ The architecture is intentionally monolithic.
 
 # 63. Monolith Is Intentional
 
-A monolithic architecture is appropriate for StudyForge because:
+A monolithic architecture is appropriate for StudyTube because:
 
 - The workload is personal-scale.
 - The feature set is focused.
@@ -1564,4 +1564,4 @@ Avoid jumping directly from UI interaction to database mutation.
 
 # 70. Final Architecture Principle
 
-> **StudyForge is a deliberately simple monolithic application: the browser provides the learning experience, feature modules own business behavior, SQLite stores the learner's state, and external services remain behind explicit boundaries.**
+> **StudyTube is a deliberately simple monolithic application: the browser provides the learning experience, feature modules own business behavior, SQLite stores the learner's state, and external services remain behind explicit boundaries.**

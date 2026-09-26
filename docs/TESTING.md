@@ -1,8 +1,8 @@
-# StudyForge — Testing Strategy
+# StudyTube — Testing Strategy
 
 ## 1. Purpose
 
-This document defines how StudyForge is tested.
+This document defines how StudyTube is tested.
 
 Testing must protect the core learner experience while keeping the test suite:
 
@@ -13,7 +13,7 @@ Testing must protect the core learner experience while keeping the test suite:
 - Focused on user behavior
 - Appropriate for a self-hosted application
 
-StudyForge should test behavior and business rules rather than implementation details.
+StudyTube should test behavior and business rules rather than implementation details.
 
 ---
 
@@ -45,7 +45,7 @@ Tests should not unnecessarily depend on:
 
 # 3. Testing Pyramid
 
-StudyForge uses three primary levels of automated testing:
+StudyTube uses three primary levels of automated testing:
 
 ```text
              E2E
@@ -758,7 +758,7 @@ Malformed external data
 
 # 32. YouTube Search Result Tests
 
-A search result should be normalized into StudyForge's internal representation.
+A search result should be normalized into StudyTube's internal representation.
 
 Tests should verify that external API fields are mapped correctly.
 
@@ -784,7 +784,7 @@ A YouTube outage must not corrupt local curriculum data.
 
 # 34. Preview Tests
 
-Previewing a search result must not create a StudyForge lesson.
+Previewing a search result must not create a StudyTube lesson.
 
 Verify:
 
@@ -827,7 +827,7 @@ The lesson must contain the required persisted YouTube metadata.
 
 Tests should confirm that YouTube-specific code remains isolated.
 
-Application features should depend on StudyForge's normalized YouTube types rather than raw external API responses.
+Application features should depend on StudyTube's normalized YouTube types rather than raw external API responses.
 
 This makes future content-source integrations easier without rewriting the learning domain.
 
@@ -1059,7 +1059,7 @@ should remain available after reload.
 
 # 45. Responsive Testing
 
-StudyForge is responsive and must remain usable on smaller screens.
+StudyTube is responsive and must remain usable on smaller screens.
 
 Playwright should include representative viewport tests for:
 
@@ -1195,7 +1195,7 @@ Avoid giant fixtures that hide the state relevant to a test.
 
 # 51. Test Data
 
-Test data should represent realistic StudyForge usage.
+Test data should represent realistic StudyTube usage.
 
 Examples may include:
 
@@ -1482,7 +1482,7 @@ The exact command names depend on the project's package configuration.
 
 Continuous integration should remain lightweight.
 
-StudyForge does not need a complicated CI platform architecture.
+StudyTube does not need a complicated CI platform architecture.
 
 CI should primarily answer:
 
@@ -1544,7 +1544,7 @@ Avoid excessive testing of:
 - Exact implementation structure
 - Trivial getter/setter logic
 
-Test StudyForge's behavior and business rules.
+Test StudyTube's behavior and business rules.
 
 ---
 
@@ -1688,7 +1688,7 @@ Tests and documentation must describe the same product behavior.
 
 # 74. Final Testing Principle
 
-> **StudyForge testing should prove that learners can reliably build, navigate, resume, and complete learning paths without losing their data or progress.**
+> **StudyTube testing should prove that learners can reliably build, navigate, resume, and complete learning paths without losing their data or progress.**
 
 The test suite should protect the product's core promise:
 

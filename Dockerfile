@@ -33,10 +33,10 @@ ENV NODE_ENV=production \
     DATABASE_URL=/data/learning.sqlite
 WORKDIR /app
 
-RUN groupadd --system studyforge \
-    && useradd --system --gid studyforge --create-home --home-dir /app studyforge \
+RUN groupadd --system studytube \
+    && useradd --system --gid studytube --create-home --home-dir /app studytube \
     && mkdir -p /data \
-    && chown -R studyforge:studyforge /app /data
+    && chown -R studytube:studytube /app /data
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next/standalone ./
@@ -45,7 +45,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/src/db/migrations ./src/db/migrations
 COPY --from=builder /app/scripts/migrate-on-boot.mjs ./scripts/migrate-on-boot.mjs
 
-USER studyforge
+USER studytube
 EXPOSE 3000
 VOLUME ["/data"]
 

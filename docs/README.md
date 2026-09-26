@@ -1,8 +1,8 @@
-# StudyForge
+# StudyTube
 
 > **Build your own learning path.**
 
-StudyForge is an open-source, self-hosted web app that helps learners turn scattered YouTube videos into structured learning paths.
+StudyTube is an open-source, self-hosted web app that helps learners turn scattered YouTube videos into structured learning paths.
 
 Create courses, organize modules, add YouTube videos as lessons, track progress, take notes, and resume where you left off.
 
@@ -88,7 +88,7 @@ pnpm dev
 
 ## YouTube API
 
-StudyForge uses the YouTube Data API v3 for searching videos and retrieving metadata.
+StudyTube uses the YouTube Data API v3 for searching videos and retrieving metadata.
 
 Each self-hosted installation uses its own YouTube API key.
 
@@ -96,7 +96,7 @@ The API key must remain server-side and should never be committed to Git.
 
 ## Deployment
 
-StudyForge runs as a single web application with SQLite persistence.
+StudyTube runs as a single web application with SQLite persistence.
 
 Docker and platforms such as Coolify are supported.
 
@@ -113,7 +113,7 @@ pnpm test:e2e
 
 ## V1 Scope
 
-StudyForge is intentionally focused on the learner experience.
+StudyTube is intentionally focused on the learner experience.
 
 V1 does **not** include:
 
@@ -143,4 +143,4 @@ For more information, see:
 
 ## License
 
-StudyForge is released under the **MIT License**.
+StudyTube is released under the **MIT License**.

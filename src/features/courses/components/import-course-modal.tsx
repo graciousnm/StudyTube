@@ -23,7 +23,7 @@ export function ImportCourseModal({ open, onClose }: ImportCourseModalProps) {
     <Modal open={open} onClose={onClose} title="Import a Course">
       <form action={formAction} className="space-y-4">
         <p className="text-sm text-zinc-400">
-          Choose a StudyForge course export file (`.studyforge-course.json`).
+          Choose a StudyTube course export file (`.studyforge-course.json`).
           The course and its modules and lessons will be added as a new course.
         </p>
 
@@ -36,7 +36,7 @@ export function ImportCourseModal({ open, onClose }: ImportCourseModalProps) {
           <span className="text-sm font-medium text-zinc-200">
             {fileName ?? "Choose a file…"}
           </span>
-          <span className="text-xs text-zinc-500">JSON export from StudyForge</span>
+          <span className="text-xs text-zinc-500">JSON export from StudyTube</span>
         </button>
 
         <input

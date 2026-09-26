@@ -1,18 +1,18 @@
-# StudyForge — Product Requirements
+# StudyTube — Product Requirements
 
 ## 1. Product Overview
 
-**Product:** StudyForge
+**Product:** StudyTube
 
 **Tagline:** Build your own learning path.
 
-StudyForge is an open-source, self-hosted learning application that allows learners to build structured courses from online video content.
+StudyTube is an open-source, self-hosted learning application that allows learners to build structured courses from online video content.
 
 The initial version focuses on YouTube as the primary content source.
 
 The learner creates the curriculum.
 
-StudyForge provides the structure, organization, sequencing, progress tracking, and learning experience.
+StudyTube provides the structure, organization, sequencing, progress tracking, and learning experience.
 
 ---
 
@@ -34,12 +34,12 @@ or:
 
 But finding individual videos is not the same as following a structured learning path.
 
-StudyForge solves this problem by allowing the learner to turn individual videos into an organized course.
+StudyTube solves this problem by allowing the learner to turn individual videos into an organized course.
 
 ```text
 Scattered Videos
        ↓
-   StudyForge
+   StudyTube
        ↓
 Structured Course
        ↓
@@ -249,9 +249,10 @@ Import:
 
 - Available from the "New Course" flow as an "Import a Course" option, next to manual and AI creation.
 - Always creates a new course; it never merges into an existing course. An import is refused when a course with the same title and the same module names in the same order already exists (compared case-insensitively after trimming), so the library never gains silent duplicates; the error names the existing course.
-- Different module names, module order, or module count let the same title import — order matters because curriculum order is significant in StudyForge.
-- Accepts only files in the StudyForge export format; anything else is rejected at the server boundary.
+- Different module names, module order, or module count let the same title import — order matters because curriculum order is significant in StudyTube.
+- Accepts only files in the StudyTube export format; anything else is rejected at the server boundary.
 - Recognizes the export format marker (`format: "studyforge-course"`), caps each import at 50 modules and 200 lessons per module, and rejects files larger than 5 MB.
+- The wire format identifier stays `studyforge-course` for backward compatibility with previously exported files; it is a format marker, not a product reference (the app is StudyTube).
 - Duplicate video IDs within a single module are skipped during import so the same video cannot be added twice to one module. Reuse of a video across modules (or across the library) remains allowed.
 - The file never touches the browser's database; it is parsed and validated server-side before any write.
 
@@ -319,23 +320,23 @@ Lessons have an explicit order.
 
 YouTube is the initial external content source.
 
-StudyForge uses YouTube for:
+StudyTube uses YouTube for:
 
 - Search
 - Video metadata
 - Embedded playback
 
-StudyForge does not host YouTube videos.
+StudyTube does not host YouTube videos.
 
-StudyForge does not download YouTube videos.
+StudyTube does not download YouTube videos.
 
-StudyForge does not redistribute YouTube video files.
+StudyTube does not redistribute YouTube video files.
 
 ---
 
 # 13. YouTube Search
 
-The learner must be able to search YouTube from inside StudyForge.
+The learner must be able to search YouTube from inside StudyTube.
 
 Example:
 
@@ -347,7 +348,7 @@ Search:
 intro to real estate
 ```
 
-StudyForge displays relevant results.
+StudyTube displays relevant results.
 
 A result should provide, where available:
 
@@ -381,13 +382,13 @@ Preview Video
 Add to Module
 ```
 
-The learner should remain inside StudyForge during the process.
+The learner should remain inside StudyTube during the process.
 
 ---
 
 # 15. Video Preview
 
-The learner must be able to preview a YouTube video without leaving StudyForge.
+The learner must be able to preview a YouTube video without leaving StudyTube.
 
 Preview should use the YouTube embedded player.
 
@@ -407,7 +408,7 @@ When the learner selects:
 
 **Add to Module**
 
-StudyForge creates a lesson referencing the selected YouTube video.
+StudyTube creates a lesson referencing the selected YouTube video.
 
 The application should store the relevant metadata and YouTube video ID.
 
@@ -426,7 +427,7 @@ After adding the video:
 
 V1 should prevent accidental duplicate lessons within the same module.
 
-If the learner attempts to add the same YouTube video twice to the same module, StudyForge should provide a clear message rather than silently creating another identical lesson.
+If the learner attempts to add the same YouTube video twice to the same module, StudyTube should provide a clear message rather than silently creating another identical lesson.
 
 The same video may be used in different modules or courses unless future product requirements change this behavior.
 
@@ -539,7 +540,7 @@ Completing a lesson updates:
 
 # 23. Watched vs Completed
 
-StudyForge distinguishes between:
+StudyTube distinguishes between:
 
 ### Playback progress
 
@@ -650,7 +651,7 @@ The UI should handle the empty state explicitly.
 
 # 27. Continue Learning
 
-StudyForge must provide a **Continue Learning** workflow.
+StudyTube must provide a **Continue Learning** workflow.
 
 The learner should not have to manually locate their current lesson.
 
@@ -671,7 +672,7 @@ Selecting the button opens the appropriate lesson in learning mode.
 
 # 28. Resume Position
 
-StudyForge should preserve learning context.
+StudyTube should preserve learning context.
 
 At minimum, it should remember:
 
@@ -698,7 +699,7 @@ Playback:
 08:42 / 16:44
 ```
 
-When the learner returns, StudyForge should use that information to restore their learning context.
+When the learner returns, StudyTube should use that information to restore their learning context.
 
 ---
 
@@ -944,7 +945,7 @@ The search field should remain available.
 
 A YouTube video may later become unavailable.
 
-StudyForge should not assume that a previously added video will remain playable forever.
+StudyTube should not assume that a previously added video will remain playable forever.
 
 If playback fails:
 
@@ -958,7 +959,7 @@ The learner should still be able to remove or replace the lesson.
 
 # 43. Product Data Ownership
 
-StudyForge owns the learner's curriculum data.
+StudyTube owns the learner's curriculum data.
 
 Examples:
 
@@ -972,7 +973,7 @@ Examples:
 
 YouTube remains the source of the referenced video content.
 
-StudyForge stores references and metadata rather than video files.
+StudyTube stores references and metadata rather than video files.
 
 ---
 
@@ -1013,7 +1014,7 @@ Refreshing the browser must not erase curriculum state.
 
 The initial product has no authentication or multi-user account system.
 
-There is one local StudyForge installation and its associated learning data.
+There is one local StudyTube installation and its associated learning data.
 
 Do not introduce user ownership fields into the domain model.
 
@@ -1023,7 +1024,7 @@ The product does include a simple local profile: a single-row table that stores 
 
 # 46. Open Source
 
-StudyForge is open source under the MIT License.
+StudyTube is open source under the MIT License.
 
 The application should be usable by other people who clone and self-host the repository.
 
@@ -1042,7 +1043,7 @@ Each installation should provide its own configuration.
 
 # 47. Self-Hosting
 
-StudyForge should be designed for self-hosting.
+StudyTube should be designed for self-hosting.
 
 A deployment may look like:
 
@@ -1080,7 +1081,7 @@ Cloudflare R2
 
 Backups are an operational concern.
 
-The learner should not need to understand R2 to use StudyForge.
+The learner should not need to understand R2 to use StudyTube.
 
 ---
 
@@ -1278,7 +1279,7 @@ AI must not silently modify a learner's course. AI output is treated as untruste
 A V1 implementation should allow a new learner to complete this workflow without external instructions:
 
 ```text
-Open StudyForge
+Open StudyTube
  ↓
 Create "Real Estate"
  ↓
@@ -1298,7 +1299,7 @@ Start Learning
  ↓
 Mark lessons complete
  ↓
-Leave StudyForge
+Leave StudyTube
  ↓
 Return later
  ↓
@@ -1343,4 +1344,4 @@ The interface should support learning rather than compete with it.
 
 # 55. Final Product Principle
 
-> **StudyForge helps learners turn scattered online content into an organized learning path they can actually follow and finish.**
+> **StudyTube helps learners turn scattered online content into an organized learning path they can actually follow and finish.**

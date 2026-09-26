@@ -47,7 +47,7 @@ const VIDEO: YouTubeVideo = {
 };
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-add-video-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-add-video-"));
   databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });

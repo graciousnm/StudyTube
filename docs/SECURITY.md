@@ -1,10 +1,10 @@
-# StudyForge — Security
+# StudyTube — Security
 
 ## 1. Purpose
 
-This document defines the security requirements and boundaries for StudyForge.
+This document defines the security requirements and boundaries for StudyTube.
 
-StudyForge is a self-hosted application designed primarily for individual learners.
+StudyTube is a self-hosted application designed primarily for individual learners.
 
 Security priorities are:
 
@@ -21,7 +21,7 @@ Security priorities are:
 
 # 2. Security Philosophy
 
-StudyForge follows a simple principle:
+StudyTube follows a simple principle:
 
 > Treat everything crossing a trust boundary as untrusted.
 
@@ -342,17 +342,17 @@ The single-row local `profile` table (see DATA_MODEL.md §44) is a name for the 
 
 Therefore, the application assumes:
 
-> Anyone with access to the deployed StudyForge instance can use and modify that instance.
+> Anyone with access to the deployed StudyTube instance can use and modify that instance.
 
 This is an important deployment assumption.
 
-StudyForge must not falsely imply that V1 provides user accounts or access control.
+StudyTube must not falsely imply that V1 provides user accounts or access control.
 
 ---
 
 # 18. Private Deployment Consideration
 
-Because V1 has no authentication, operators who need restricted access should place StudyForge behind an appropriate external access-control layer.
+Because V1 has no authentication, operators who need restricted access should place StudyTube behind an appropriate external access-control layer.
 
 Examples may include:
 
@@ -403,7 +403,7 @@ For custom Route Handlers:
 
 # 21. Same-Origin Assumption
 
-StudyForge is primarily designed as a same-origin web application.
+StudyTube is primarily designed as a same-origin web application.
 
 For example:
 
@@ -429,7 +429,7 @@ Avoid unnecessary cross-origin APIs.
 
 # 22. CORS
 
-StudyForge should not enable permissive CORS by default.
+StudyTube should not enable permissive CORS by default.
 
 Avoid configurations such as:
 
@@ -533,7 +533,7 @@ must not cause JavaScript to execute when the note is displayed.
 
 YouTube API responses are external data.
 
-Even though they originate from a trusted platform, StudyForge should treat them as untrusted input.
+Even though they originate from a trusted platform, StudyTube should treat them as untrusted input.
 
 Validate:
 
@@ -559,7 +559,7 @@ Architecture:
 ```text
 Browser
    ↓
-StudyForge Server
+StudyTube Server
    ↓
 YouTube API
 ```
@@ -569,7 +569,7 @@ Never:
 ```text
 Browser
    ↓
-YouTube API with StudyForge secret
+YouTube API with StudyTube secret
 ```
 
 ---
@@ -578,7 +578,7 @@ YouTube API with StudyForge secret
 
 Search endpoints should not allow unlimited uncontrolled requests.
 
-StudyForge should:
+StudyTube should:
 
 - Require an explicit search action
 - Validate search parameters
@@ -592,7 +592,7 @@ If rate limiting becomes necessary, it can be introduced at the application or i
 
 # 31. YouTube URL Handling
 
-StudyForge should store the canonical YouTube video ID rather than trusting arbitrary URLs as persistent identifiers.
+StudyTube should store the canonical YouTube video ID rather than trusting arbitrary URLs as persistent identifiers.
 
 Example:
 
@@ -628,7 +628,7 @@ Avoid patterns such as:
 
 unless the destination is validated against a strict allowlist.
 
-StudyForge does not require arbitrary external redirects in V1.
+StudyTube does not require arbitrary external redirects in V1.
 
 ---
 
@@ -638,7 +638,7 @@ The YouTube player is external content.
 
 The application should embed it through the supported YouTube player mechanism rather than attempting to download or proxy the video.
 
-The player should not receive StudyForge server secrets.
+The player should not receive StudyTube server secrets.
 
 ---
 
@@ -662,7 +662,7 @@ Do not deploy an overly restrictive policy that breaks the core learning experie
 
 # 36. Content Security Policy
 
-StudyForge ships a pragmatic Content-Security-Policy header that covers the required StudyForge resources.
+StudyTube ships a pragmatic Content-Security-Policy header that covers the required StudyTube resources.
 
 The policy:
 
@@ -684,9 +684,9 @@ The CSP is tested against Learning Mode and YouTube playback in the manual brows
 
 # 37. Clickjacking
 
-StudyForge sends `X-Frame-Options: DENY` to prevent unauthorized framing of the application.
+StudyTube sends `X-Frame-Options: DENY` to prevent unauthorized framing of the application.
 
-The application does not allow arbitrary third-party sites to embed the StudyForge UI.
+The application does not allow arbitrary third-party sites to embed the StudyTube UI.
 
 ---
 
@@ -933,7 +933,7 @@ Authorization must be evaluated against the authenticated user.
 
 V1 does not support file uploads.
 
-Therefore, StudyForge does not need to implement:
+Therefore, StudyTube does not need to implement:
 
 - Multipart upload security
 - File-type detection
@@ -947,7 +947,7 @@ If uploads are added later, they require a separate security design.
 
 # 52. Local Video Hosting
 
-StudyForge does not host downloaded YouTube videos.
+StudyTube does not host downloaded YouTube videos.
 
 Therefore, it does not require a media-upload security layer in V1.
 
@@ -991,7 +991,7 @@ Credentials should be supplied through environment configuration rather than sto
 
 Dependencies are part of the application's attack surface.
 
-StudyForge should:
+StudyTube should:
 
 - Keep dependencies reasonably current
 - Review security advisories
@@ -1300,7 +1300,7 @@ Distributed infrastructure
 
 # 73. V1 Security Boundary
 
-StudyForge V1 should be understood as:
+StudyTube V1 should be understood as:
 
 ```text
 A self-hosted application
@@ -1368,7 +1368,7 @@ AI assistance (course creation, module creation, and missing-module suggestions)
 
 # 75. Final Security Principle
 
-> **StudyForge should expose as little as necessary, trust as little as necessary, validate every external input, and keep learner data and server credentials behind clear boundaries.**
+> **StudyTube should expose as little as necessary, trust as little as necessary, validate every external input, and keep learner data and server credentials behind clear boundaries.**
 
 The fundamental security model is:
 

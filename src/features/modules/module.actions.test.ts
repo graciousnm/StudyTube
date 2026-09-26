@@ -55,7 +55,7 @@ async function expectRedirect(
 }
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-module-actions-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-module-actions-"));
   databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });

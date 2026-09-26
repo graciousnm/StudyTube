@@ -1,12 +1,12 @@
-# StudyForge — Design System & UX Guidelines
+# StudyTube — Design System & UX Guidelines
 
 ## 1. Design Identity
 
-**Product:** StudyForge
+**Product:** StudyTube
 
 **Tagline:** Build your own learning path.
 
-StudyForge is a focused learning environment where learners organize online video content into structured courses.
+StudyTube is a focused learning environment where learners organize online video content into structured courses.
 
 The interface should feel:
 
@@ -18,7 +18,7 @@ The interface should feel:
 - Practical
 - Lightweight
 
-StudyForge should feel like a place where someone **comes to learn**, not a place where someone **comes to manage a business**.
+StudyTube should feel like a place where someone **comes to learn**, not a place where someone **comes to manage a business**.
 
 ---
 
@@ -39,7 +39,7 @@ Avoid visual elements that do not help answer those questions.
 
 # 3. Visual Personality
 
-StudyForge should have a restrained visual language.
+StudyTube should have a restrained visual language.
 
 Use:
 
@@ -178,7 +178,7 @@ Unrelated content should have sufficient separation.
 
 # 7. Layout
 
-StudyForge should use a responsive content-centered layout.
+StudyTube should use a responsive content-centered layout.
 
 Desktop:
 
@@ -211,7 +211,7 @@ Primary navigation should remain simple.
 Recommended structure:
 
 ```text
-StudyForge
+StudyTube
 
 My Learning (/)
 Courses (/courses)
@@ -364,7 +364,7 @@ Course create and edit open in a modal dialog (from the header/home and the cour
 
 Import and export live inside these same flows rather than on their own pages:
 
-- The course actions menu (top-right of the course header) offers Edit / Export / Delete. Export triggers a direct `.studyforge-course.json` download of that course's curriculum (title, description, learning goal, modules, lessons).
+- The course actions menu (top-right of the course header) offers Edit / Export / Delete. Export triggers a direct `.studyforge-course.json` download of that course's curriculum (title, description, learning goal, modules, lessons). The file identifier stays `studyforge-course` for backward compatibility with existing exports; it is a format marker, not a product reference.
 - The "New Course" flow's choice modal shows three options: Create Manually, Import a Course, and (when available) Create with AI. Import opens a modal with a file picker and a short explanation; the file is sent to the server, which validates it and redirects to the newly created course on success, or shows an error in place. An import is refused when a course with the same title and the same ordered module names already exists, and the modal explains the duplicate so the learner can rename or delete the existing course instead.
 - The "Add Module" control on the course page opens a choice modal mirroring the course flow: Create Manually, Generate with AI, and (when available and the course already has modules) Suggest Missing Module; the two AI options appear only when the AI provider is configured. Manual opens the existing module form. Generate with AI collects a module focus (plus optional experience and detail level), produces a single proposed module, and shows it in a review where the learner edits the title, description, and topics before accepting. Suggest Missing Module has the AI scan the course (goal, module descriptions, sampled lesson titles) and propose one likely-missing module, which flows through the same review. Once accepted, the module is created and the learner may go on to the same optional AI video-curation step used by the course flow, then lands on the new module's page.
 
@@ -455,7 +455,7 @@ The interface should make this workflow obvious.
 
 # 14. YouTube Search
 
-YouTube search should feel integrated into StudyForge rather than like a separate website.
+YouTube search should feel integrated into StudyTube rather than like a separate website.
 
 The add-video page uses the expanded `lg` content width (max-w-5xl) and focuses entirely on search — the module page already lists lessons.
 
@@ -498,7 +498,7 @@ Do not overwhelm the result card with unnecessary metadata.
 
 # 15. Video Preview
 
-Preview should happen **inside StudyForge**.
+Preview should happen **inside StudyTube**.
 
 Do not send the learner to YouTube merely to preview a video.
 
@@ -550,7 +550,7 @@ The learner should be able to continue adding videos efficiently.
 
 # 17. Reordering Lessons
 
-Lesson ordering is important because StudyForge represents a learning path.
+Lesson ordering is important because StudyTube represents a learning path.
 
 Use an intuitive reorder interaction.
 
@@ -576,7 +576,7 @@ V1 shows the move-up/move-down arrows on small screens only. Desktop drag-and-dr
 
 # 18. Learning Mode
 
-Learning mode is one of the most important experiences in StudyForge.
+Learning mode is one of the most important experiences in StudyTube.
 
 It should minimize distractions.
 
@@ -653,7 +653,7 @@ Progress
 Continue Learning
 ```
 
-If the learner previously stopped halfway through a lesson, StudyForge should restore that context where technically possible.
+If the learner previously stopped halfway through a lesson, StudyTube should restore that context where technically possible.
 
 The learner should not have to manually remember where they stopped.
 
@@ -876,7 +876,7 @@ unless explicitly added to the product requirements later.
 
 # 29. Responsive Design
 
-StudyForge must work on:
+StudyTube must work on:
 
 - Desktop
 - Laptop
@@ -895,7 +895,7 @@ Possible pattern:
 
 ```text
 ┌───────────────────────────────┐
-│ StudyForge              ☰     │
+│ StudyTube              ☰     │
 └───────────────────────────────┘
 ```
 
@@ -1166,7 +1166,7 @@ Course
  └── Miscellaneous
 ```
 
-StudyForge is a learning tool, not an analytics dashboard.
+StudyTube is a learning tool, not an analytics dashboard.
 
 ---
 
@@ -1256,7 +1256,7 @@ The application should never leave the learner wondering whether an action worke
 
 # 46. Product Personality
 
-StudyForge should feel like:
+StudyTube should feel like:
 
 > A quiet workspace for building a meaningful learning habit.
 
@@ -1317,7 +1317,7 @@ Reports
 ✨ AI Recommendations
 ```
 
-These are not part of StudyForge V1.
+These are not part of StudyTube V1.
 
 ---
 
@@ -1340,7 +1340,7 @@ Do not implement only the happy path.
 
 # 49. Final Design Principle
 
-> **StudyForge should make learning feel organized, not managed.**
+> **StudyTube should make learning feel organized, not managed.**
 
 Every design decision should support that principle.
 
@@ -1360,7 +1360,7 @@ Purpose:
 The onboarding page is minimal:
 
 ```text
-← Back to StudyForge
+← Back to StudyTube
 
 Name this installation
 helper text

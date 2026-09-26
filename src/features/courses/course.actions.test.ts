@@ -73,7 +73,7 @@ function onlyCourseId(): number {
 }
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-actions-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-actions-"));
   databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });
@@ -81,7 +81,7 @@ beforeAll(async () => {
 
   process.env.DATABASE_URL = databaseUrl;
   closeDb();
-  delete (globalThis as { __studyforgeDb?: unknown }).__studyforgeDb;
+  delete (globalThis as { __studytubeDb?: unknown }).__studytubeDb;
   actions = await import("./course.actions");
   revalidatePath = (await import("next/cache")).revalidatePath as unknown as ReturnType<
     typeof vi.fn

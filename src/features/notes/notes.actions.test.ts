@@ -31,7 +31,7 @@ let actions: typeof import("./notes.actions");
 let revalidatePath: ReturnType<typeof vi.fn>;
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-notes-actions-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-notes-actions-"));
   const databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });

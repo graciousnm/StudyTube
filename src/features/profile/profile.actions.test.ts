@@ -50,7 +50,7 @@ function formName(value: string): FormData {
 }
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-profile-actions-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-profile-actions-"));
   const databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });
@@ -58,7 +58,7 @@ beforeAll(async () => {
 
   process.env.DATABASE_URL = databaseUrl;
   closeDb();
-  delete (globalThis as { __studyforgeDb?: unknown }).__studyforgeDb;
+  delete (globalThis as { __studytubeDb?: unknown }).__studytubeDb;
   actions = await import("./profile.actions");
   revalidatePath = (await import("next/cache")).revalidatePath as unknown as ReturnType<
     typeof vi.fn

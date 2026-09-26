@@ -75,8 +75,8 @@ In Docker, migrations run automatically on container start.
 ### Docker
 
 ```bash
-docker build -t studyforge .
-docker run --rm -p 3000:3000 -v studyforge-data:/data studyforge
+docker build -t studytube .
+docker run --rm -p 3000:3000 -v studytube-data:/data studytube
 ```
 
 The container applies pending migrations on first start and keeps the SQLite database on the `/data` volume.

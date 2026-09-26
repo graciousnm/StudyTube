@@ -1,14 +1,14 @@
-# StudyForge — YouTube Integration
+# StudyTube — YouTube Integration
 
 ## 1. Purpose
 
-This document defines how StudyForge integrates with YouTube.
+This document defines how StudyTube integrates with YouTube.
 
 YouTube is the content source for V1.
 
-StudyForge does not host, download, proxy, or redistribute YouTube videos.
+StudyTube does not host, download, proxy, or redistribute YouTube videos.
 
-StudyForge uses YouTube for:
+StudyTube uses YouTube for:
 
 - Searching for educational videos
 - Displaying video metadata
@@ -20,7 +20,7 @@ StudyForge uses YouTube for:
 
 # 2. YouTube Services Used
 
-StudyForge uses two primary YouTube technologies:
+StudyTube uses two primary YouTube technologies:
 
 ```text
 YouTube Data API v3
@@ -52,7 +52,7 @@ Do not use the Data API as a video playback mechanism.
 # 3. High-Level Architecture
 
 ```text
-                         StudyForge
+                         StudyTube
                              │
               ┌──────────────┴──────────────┐
               │                             │
@@ -105,16 +105,16 @@ Do not place the API key in:
 - URLs sent to the browser
 - Search result objects returned unnecessarily to the client
 
-The browser communicates with StudyForge.
+The browser communicates with StudyTube.
 
-StudyForge communicates with YouTube.
+StudyTube communicates with YouTube.
 
 ```text
 Browser
    │
    │ search request
    ▼
-StudyForge Server
+StudyTube Server
    │
    │ API key
    ▼
@@ -141,7 +141,7 @@ The key must not be committed to source control.
 
 # 7. Self-Hosted API Keys
 
-Each self-hosted StudyForge installation should use its own YouTube API key.
+Each self-hosted StudyTube installation should use its own YouTube API key.
 
 The project should not ship with a shared API key.
 
@@ -202,7 +202,7 @@ The server should validate:
 
 Do not allow arbitrary request parameters to be forwarded directly to YouTube.
 
-The server should control which YouTube API options StudyForge supports.
+The server should control which YouTube API options StudyTube supports.
 
 ---
 
@@ -215,7 +215,7 @@ The application should not search:
 - Channels
 - Playlists
 - Live streams as a separate content type
-- Shorts as a separate StudyForge feature
+- Shorts as a separate StudyTube feature
 
 unless explicitly required.
 
@@ -225,7 +225,7 @@ The default search should target normal educational video content.
 
 # 12. Search Results
 
-StudyForge should normalize YouTube results into its own internal representation.
+StudyTube should normalize YouTube results into its own internal representation.
 
 Example:
 
@@ -255,7 +255,7 @@ YouTube API
     ↓
 YouTube adapter
     ↓
-StudyForge Search Result
+StudyTube Search Result
 ```
 
 The normalized representation should contain only the fields the UI actually needs.
@@ -387,7 +387,7 @@ YouTube search is temporarily unavailable.
 
 YouTube search quota has been reached.
 
-YouTube search is not configured on this StudyForge installation.
+YouTube search is not configured on this StudyTube installation.
 ```
 
 Avoid displaying:
@@ -440,7 +440,7 @@ Lesson started
 
 and does not create a lesson.
 
-Only an added lesson participates in StudyForge learning progress.
+Only an added lesson participates in StudyTube learning progress.
 
 ---
 
@@ -462,7 +462,7 @@ When the learner selects:
 Add
 ```
 
-StudyForge should:
+StudyTube should:
 
 1. Validate the selected YouTube video ID.
 2. Verify the target module exists.
@@ -527,7 +527,7 @@ This is allowed.
 
 The YouTube video ID is the canonical external identifier.
 
-StudyForge should not rely on the full URL as the primary identifier.
+StudyTube should not rely on the full URL as the primary identifier.
 
 Supported input forms may include YouTube URLs if a future direct-URL-add feature is introduced.
 
@@ -537,7 +537,7 @@ V1 search results already provide the video ID.
 
 # 28. YouTube URLs
 
-When StudyForge needs a watch URL, it should construct it from the stored ID.
+When StudyTube needs a watch URL, it should construct it from the stored ID.
 
 Conceptually:
 
@@ -563,7 +563,7 @@ Region restricted
 Embedding restricted
 ```
 
-StudyForge should not automatically delete the lesson.
+StudyTube should not automatically delete the lesson.
 
 The learner's curriculum remains intact.
 
@@ -669,7 +669,7 @@ Do not place completion business logic directly inside the player component.
 
 # 35. Playback Position Persistence
 
-StudyForge should persist playback position periodically rather than writing to SQLite every second.
+StudyTube should persist playback position periodically rather than writing to SQLite every second.
 
 The exact interval should be selected during implementation based on:
 
@@ -759,7 +759,7 @@ Buffering
 Cued
 ```
 
-StudyForge only needs the states necessary for its user experience and progress persistence.
+StudyTube only needs the states necessary for its user experience and progress persistence.
 
 Do not build a full analytics state machine.
 
@@ -898,7 +898,7 @@ Never pass invalid values directly to the player.
 
 A YouTube video may disappear after being added.
 
-StudyForge must not interpret external disappearance as a database deletion request.
+StudyTube must not interpret external disappearance as a database deletion request.
 
 The lesson remains:
 

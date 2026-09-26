@@ -1,8 +1,8 @@
-# StudyForge — Progress System
+# StudyTube — Progress System
 
 ## 1. Purpose
 
-This document defines how StudyForge tracks learner progress.
+This document defines how StudyTube tracks learner progress.
 
 Progress must be:
 
@@ -20,7 +20,7 @@ The database is the source of truth.
 
 # 2. Core Principle
 
-StudyForge distinguishes between:
+StudyTube distinguishes between:
 
 ```text id="8q0h5n"
 Watching a lesson
@@ -186,13 +186,13 @@ This avoids accidental completion and keeps progress semantics simple.
 
 # 11. Playback Position
 
-StudyForge stores:
+StudyTube stores:
 
 ```text id="3n6jvb"
 playback_position_seconds
 ```
 
-This represents the latest useful playback position known to StudyForge.
+This represents the latest useful playback position known to StudyTube.
 
 It is used primarily for:
 
@@ -212,7 +212,7 @@ The goal is:
 
 > Resume approximately where the learner stopped.
 
-StudyForge should periodically persist playback position rather than writing every playback event to SQLite.
+StudyTube should periodically persist playback position rather than writing every playback event to SQLite.
 
 ---
 
@@ -269,7 +269,7 @@ Unnecessary database writes
 
 # 16. Browser Exit
 
-StudyForge cannot guarantee that a browser will always allow a final network request when a tab or browser is closed.
+StudyTube cannot guarantee that a browser will always allow a final network request when a tab or browser is closed.
 
 Therefore, the application should not depend solely on an unload event.
 
@@ -757,9 +757,9 @@ Notes and progress are separate domains.
 
 # 42. Preview and Progress
 
-Previewing a YouTube search result does not affect StudyForge progress.
+Previewing a YouTube search result does not affect StudyTube progress.
 
-Only an existing StudyForge lesson can have progress.
+Only an existing StudyTube lesson can have progress.
 
 ---
 
@@ -822,7 +822,7 @@ If the learner explicitly marks it incomplete, completion is removed.
 
 A completed lesson may still retain its last playback position.
 
-When reopened, StudyForge may resume from that position.
+When reopened, StudyTube may resume from that position.
 
 The application should not unexpectedly reset completed lessons unless the learner explicitly chooses to restart.
 
@@ -1014,7 +1014,7 @@ Restoring the database should restore the learner's previous learning state.
 
 # 57. Progress Is Not Analytics
 
-StudyForge does not attempt to answer questions such as:
+StudyTube does not attempt to answer questions such as:
 
 ```text id="v2k8r6"
 How many seconds did the learner watch?
@@ -1041,7 +1041,7 @@ Progress data is local application data.
 
 It should not be sent to external analytics providers.
 
-YouTube should not be used as a StudyForge progress database.
+YouTube should not be used as a StudyTube progress database.
 
 ---
 
@@ -1139,7 +1139,7 @@ Course Progress Updates
 Course Becomes Complete
 ```
 
-This workflow represents one of the most important StudyForge user journeys.
+This workflow represents one of the most important StudyTube user journeys.
 
 ---
 
@@ -1179,4 +1179,4 @@ Progress survives database backup and restore.
 
 # 62. Final Progress Principle
 
-> **StudyForge tracks enough state to help the learner know what they have completed and resume where they left off, without turning learning progress into an analytics system.**
+> **StudyTube tracks enough state to help the learner know what they have completed and resume where they left off, without turning learning progress into an analytics system.**

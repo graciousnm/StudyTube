@@ -29,7 +29,7 @@ let actions: typeof import("./progress.actions");
 let revalidatePath: ReturnType<typeof vi.fn>;
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-progress-actions-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-progress-actions-"));
   const databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });

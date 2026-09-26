@@ -1,12 +1,12 @@
-# StudyForge — Data Model
+# StudyTube — Data Model
 
 ## 1. Purpose
 
-This document defines the persistent data model for StudyForge.
+This document defines the persistent data model for StudyTube.
 
 The database is intentionally simple.
 
-StudyForge V1 uses:
+StudyTube V1 uses:
 
 - SQLite
 - Drizzle ORM
@@ -43,7 +43,7 @@ Course
 
 There is no User entity in V1.
 
-V1 does include a single-row local `profile` table (see §44). A profile is not an account: it stores one installation-level name so a self-hosted StudyForge instance can feel personal. It has no relationship to the curriculum hierarchy and provides no access control.
+V1 does include a single-row local `profile` table (see §44). A profile is not an account: it stores one installation-level name so a self-hosted StudyTube instance can feel personal. It has no relationship to the curriculum hierarchy and provides no access control.
 
 ---
 
@@ -328,19 +328,19 @@ updated_at
 
 # 10. Lesson Identity
 
-The StudyForge lesson ID and YouTube video ID are different concepts.
+The StudyTube lesson ID and YouTube video ID are different concepts.
 
 Example:
 
 ```text id="qk7l6w"
-StudyForge Lesson ID:
+StudyTube Lesson ID:
 lesson_123
 
 YouTube Video ID:
 dQw4w9WgXcQ
 ```
 
-The StudyForge lesson represents the learner's curriculum item.
+The StudyTube lesson represents the learner's curriculum item.
 
 The YouTube ID identifies the external video.
 
@@ -407,7 +407,7 @@ The application can construct the appropriate URL when necessary.
 
 # 13. YouTube Metadata
 
-StudyForge should store useful metadata returned from YouTube so normal lesson displays do not require a YouTube API request every time.
+StudyTube should store useful metadata returned from YouTube so normal lesson displays do not require a YouTube API request every time.
 
 Stored metadata:
 
@@ -425,7 +425,7 @@ This metadata represents the video information known when the lesson was added.
 
 It may become stale if the YouTube video changes later.
 
-StudyForge should not require metadata to be perfectly synchronized with YouTube in V1.
+StudyTube should not require metadata to be perfectly synchronized with YouTube in V1.
 
 ---
 
@@ -483,7 +483,7 @@ This is informational metadata.
 
 It should not be treated as canonical curriculum content.
 
-The learner's own notes and curriculum structure belong to StudyForge.
+The learner's own notes and curriculum structure belong to StudyTube.
 
 ---
 
@@ -570,7 +570,7 @@ meaning approximately:
 8 minutes 32 seconds
 ```
 
-This allows StudyForge to resume playback where technically supported.
+This allows StudyTube to resume playback where technically supported.
 
 ---
 
@@ -942,7 +942,7 @@ Destructive operations initiated by the user must still have appropriate UI conf
 
 # 36. Ordering
 
-Ordering is fundamental to StudyForge.
+Ordering is fundamental to StudyTube.
 
 Modules have:
 
@@ -1117,7 +1117,7 @@ Do not store:
 - Analytics unrelated to learning
 - Unnecessary API responses
 
-The database should contain only information needed by StudyForge.
+The database should contain only information needed by StudyTube.
 
 ---
 
@@ -1135,7 +1135,7 @@ permissions
 
 There is no `user_id` column on courses, modules, lessons, progress, or notes.
 
-The database represents one StudyForge installation.
+The database represents one StudyTube installation.
 
 ## Local Profile Carve-Out
 
@@ -1143,7 +1143,7 @@ V1 does include one small exception: a single-row `profile` table.
 
 Purpose:
 
-- Names the StudyForge installation.
+- Names the StudyTube installation.
 - Enables the first-run onboarding step and the Profile page.
 - Is entirely local to the installation.
 
@@ -1205,7 +1205,7 @@ user_activity
 
 unless a concrete product requirement requires them.
 
-StudyForge does not need an analytics system to provide its core learning experience.
+StudyTube does not need an analytics system to provide its core learning experience.
 
 ---
 
@@ -1359,7 +1359,7 @@ Never assume a development database is disposable when testing migration behavio
 
 # 54. Seed Data
 
-StudyForge may provide optional development seed data.
+StudyTube may provide optional development seed data.
 
 Seed data must never be required for production use.
 
@@ -1424,7 +1424,7 @@ The learner should not be locked into:
 - YouTube API infrastructure
 - A specific hosting provider
 
-The SQLite database should remain a self-contained representation of the learner's StudyForge data, apart from external YouTube content references.
+The SQLite database should remain a self-contained representation of the learner's StudyTube data, apart from external YouTube content references.
 
 ## Course import/export
 
@@ -1434,7 +1434,7 @@ Courses can be exported as portable JSON (`studyforge-course` format, version 1)
 
 # 58. External Content Dependency
 
-StudyForge lessons reference YouTube content.
+StudyTube lessons reference YouTube content.
 
 Therefore, a lesson may remain in the database even if:
 
@@ -1443,7 +1443,7 @@ Therefore, a lesson may remain in the database even if:
 - The video becomes unavailable.
 - Metadata changes.
 
-StudyForge should preserve the learner's curriculum record rather than silently deleting the lesson.
+StudyTube should preserve the learner's curriculum record rather than silently deleting the lesson.
 
 The learner can decide whether to remove or replace it.
 

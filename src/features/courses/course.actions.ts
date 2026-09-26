@@ -186,7 +186,7 @@ export async function importCourseAction(
 
   const validated = courseImportSchema.safeParse(parsed);
   if (!validated.success) {
-    return { error: "The file is not a valid StudyForge course export." };
+    return { error: "The file is not a valid StudyTube course export." };
   }
 
   const db = getDb();

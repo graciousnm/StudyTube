@@ -1,10 +1,10 @@
-# StudyForge — Deployment & Operations
+# StudyTube — Deployment & Operations
 
 ## 1. Purpose
 
-This document defines how StudyForge is built, deployed, operated, updated, backed up, and restored.
+This document defines how StudyTube is built, deployed, operated, updated, backed up, and restored.
 
-StudyForge is designed around:
+StudyTube is designed around:
 
 ```text
 Next.js
@@ -26,7 +26,7 @@ The goal is:
 
 # 2. Deployment Philosophy
 
-StudyForge does not require a distributed infrastructure stack.
+StudyTube does not require a distributed infrastructure stack.
 
 V1 should prefer:
 
@@ -64,20 +64,20 @@ Internet
    ↓
 Reverse Proxy
    ↓
-StudyForge Container
+StudyTube Container
    ↓
 SQLite
 ```
 
 A reverse proxy may be provided by the hosting platform.
 
-StudyForge itself does not need to manage TLS termination.
+StudyTube itself does not need to manage TLS termination.
 
 ---
 
 # 4. Docker
 
-StudyForge ships a production Docker image built from the `Dockerfile` in the repository root.
+StudyTube ships a production Docker image built from the `Dockerfile` in the repository root.
 
 The Docker image contains:
 
@@ -100,8 +100,8 @@ It does not contain:
 Build and run:
 
 ```text
-docker build -t studyforge .
-docker run --rm -p 3000:3000 -v studyforge-data:/data studyforge
+docker build -t studytube .
+docker run --rm -p 3000:3000 -v studytube-data:/data studytube
 ```
 
 The container exposes port `3000` and persists the SQLite database under `/data`.
@@ -120,7 +120,7 @@ builder    → full install + next build (standalone output)
 runner     → production runtime image
 ```
 
-The final runtime image contains only what is required to run StudyForge:
+The final runtime image contains only what is required to run StudyTube:
 
 ```text
 Standalone Next.js server
@@ -138,7 +138,7 @@ The runtime image runs as a non-root user and writes only to `/data`.
 
 # 6. Node.js Runtime
 
-StudyForge pins a supported Node.js LTS release: **Node.js 24 LTS** (`>=24 <25`).
+StudyTube pins a supported Node.js LTS release: **Node.js 24 LTS** (`>=24 <25`).
 
 The exact version is pinned consistently across:
 
@@ -155,7 +155,7 @@ Do not allow local development and production to silently use incompatible Node.
 
 # 7. Package Manager
 
-StudyForge uses:
+StudyTube uses:
 
 ```text
 pnpm
@@ -267,14 +267,14 @@ Coolify
       ↓
 Docker Build
       ↓
-StudyForge Container
+StudyTube Container
       ↓
 Persistent Volume
 ```
 
 Coolify is deployment infrastructure, not an application dependency.
 
-StudyForge must remain deployable without Coolify.
+StudyTube must remain deployable without Coolify.
 
 ---
 
@@ -392,7 +392,7 @@ It must not be:
 - Logged
 - Returned in API responses
 
-The browser should request YouTube functionality through StudyForge's server-side integration.
+The browser should request YouTube functionality through StudyTube's server-side integration.
 
 ---
 
@@ -426,7 +426,7 @@ Debugging output intended only for local development should not appear in produc
 
 # 21. Logging
 
-StudyForge should use normal application logs.
+StudyTube should use normal application logs.
 
 Logs should help identify:
 
@@ -557,7 +557,7 @@ Initialize database        (automatic: migrate-on-boot on first start)
       ↓
 Run migrations             (automatic, same step)
       ↓
-Open StudyForge
+Open StudyTube
 ```
 
 No manual database step is required: the first container start creates and migrates the database at `DATABASE_URL`.
@@ -653,7 +653,7 @@ Backups should run independently of normal learner interaction where practical.
 
 Cloudflare R2 is an optional external backup destination.
 
-It is not required for StudyForge to function.
+It is not required for StudyTube to function.
 
 Conceptually:
 
@@ -690,7 +690,7 @@ Backups should use deterministic, timestamped names.
 Example:
 
 ```text
-studyforge-2026-09-17.sqlite
+studytube-2026-09-17.sqlite
 ```
 
 or an equivalent unambiguous format.
@@ -780,7 +780,7 @@ Backup failure logged
 not:
 
 ```text
-StudyForge unavailable
+StudyTube unavailable
 ```
 
 The primary application and its database remain local.
@@ -817,7 +817,7 @@ The application must still maintain a valid SQLite database during normal operat
 
 # 42. YouTube Dependency
 
-StudyForge depends on YouTube for external content discovery and playback.
+StudyTube depends on YouTube for external content discovery and playback.
 
 However:
 
@@ -843,7 +843,7 @@ Existing curriculum is local data.
 
 The YouTube Data API is quota-based.
 
-StudyForge should minimize unnecessary API requests.
+StudyTube should minimize unnecessary API requests.
 
 Search should be explicit rather than triggered by every keystroke.
 
@@ -857,7 +857,7 @@ Exact quota values should not be hard-coded into deployment documentation unless
 
 # 44. No Video Hosting
 
-StudyForge does not download or host YouTube videos.
+StudyTube does not download or host YouTube videos.
 
 The deployment therefore does not require:
 
@@ -875,7 +875,7 @@ YouTube remains the external content host.
 
 # 45. Resource Expectations
 
-StudyForge is intended for personal or small self-hosted deployments.
+StudyTube is intended for personal or small self-hosted deployments.
 
 The infrastructure does not need to be optimized for large-scale SaaS workloads.
 
@@ -894,7 +894,7 @@ Do not prematurely optimize for thousands of concurrent users.
 
 # 46. Persistent Storage Capacity
 
-SQLite database size should remain relatively small because StudyForge stores:
+SQLite database size should remain relatively small because StudyTube stores:
 
 ```text
 Curriculum metadata
@@ -944,7 +944,7 @@ or the persistent filesystem.
 
 # 49. Reverse Proxy and HTTPS
 
-Production deployments should normally expose StudyForge through HTTPS.
+Production deployments should normally expose StudyTube through HTTPS.
 
 TLS termination may be handled by:
 
@@ -954,13 +954,13 @@ Reverse proxy
 Hosting platform
 ```
 
-StudyForge itself does not need to implement TLS.
+StudyTube itself does not need to implement TLS.
 
 ---
 
 # 50. Domain Configuration
 
-StudyForge should work behind a normal domain or subdomain.
+StudyTube should work behind a normal domain or subdomain.
 
 The application should not hard-code a production hostname.
 
@@ -1002,7 +1002,7 @@ The application behavior should remain consistent across environments wherever p
 
 # 52. Local Development
 
-A developer should be able to run StudyForge without:
+A developer should be able to run StudyTube without:
 
 ```text
 Coolify
@@ -1018,7 +1018,7 @@ YouTube functionality requires a valid API key if live search is being used.
 
 # 53. Self-Hosting Without Coolify
 
-StudyForge documentation must not imply that Coolify is mandatory.
+StudyTube documentation must not imply that Coolify is mandatory.
 
 A self-hosted operator should be able to run:
 
@@ -1121,7 +1121,7 @@ Before production deployment:
 
 # 58. Production Readiness Checklist
 
-Before exposing StudyForge to normal use:
+Before exposing StudyTube to normal use:
 
 ```text
 [ ] Production build succeeds
@@ -1191,7 +1191,7 @@ Ordering
 
 The deployment architecture must prioritize protecting these records.
 
-YouTube content itself is external and is not owned by StudyForge.
+YouTube content itself is external and is not owned by StudyTube.
 
 ---
 
@@ -1206,7 +1206,7 @@ New container created
        ↓
 Persistent database reattached
        ↓
-StudyForge continues
+StudyTube continues
 ```
 
 This is a fundamental requirement of the deployment model.
@@ -1215,7 +1215,7 @@ This is a fundamental requirement of the deployment model.
 
 # 63. Infrastructure Boundary
 
-StudyForge owns:
+StudyTube owns:
 
 ```text
 Application behavior
@@ -1252,7 +1252,7 @@ Deployment-specific configuration belongs at the infrastructure boundary.
 
 # 65. Future Scaling
 
-If StudyForge eventually needs significantly larger scale, the architecture can evolve.
+If StudyTube eventually needs significantly larger scale, the architecture can evolve.
 
 Possible future changes could include:
 
@@ -1274,7 +1274,7 @@ Do not introduce them before the product actually requires them.
 
 # 66. Final Deployment Principle
 
-> **StudyForge should be easy to deploy, difficult to accidentally lose data from, and independent of any particular hosting provider.**
+> **StudyTube should be easy to deploy, difficult to accidentally lose data from, and independent of any particular hosting provider.**
 
 The essential production model is:
 
@@ -1283,7 +1283,7 @@ Git Repository
       ↓
 Docker Build
       ↓
-StudyForge
+StudyTube
       ↓
 Persistent SQLite
       ↓

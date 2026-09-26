@@ -60,7 +60,7 @@ let moduleId: number;
 let actions: typeof import("./lesson.actions");
 
 beforeAll(async () => {
-  dir = mkdtempSync(path.join(os.tmpdir(), "studyforge-add-video-int-"));
+  dir = mkdtempSync(path.join(os.tmpdir(), "studytube-add-video-int-"));
   databaseUrl = path.join(dir, "test.sqlite");
   const setup = createDb(databaseUrl);
   migrate(setup.db, { migrationsFolder });
